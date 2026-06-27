@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard - Phytness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal: #00A3A0; --teal-dark: #007A78; --orange: #F47B20;
+      --dark: #1A2E35; --darker: #0d1a1e; --text: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--text); min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(0,0,0,0.4); padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-brand { font-family: 'Poppins', sans-serif; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+    
+    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .header { margin-bottom: 30px; text-align: center; }
+    .header h1 { font-family: 'Poppins', sans-serif; font-weight: 600; margin-bottom: 8px; }
+    .header p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+    
+    .card {
+      background: var(--glass-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px;
+      margin-bottom: 24px;
+    }
+    
+    .doc-info { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+    .doc-avatar { width: 60px; height: 60px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    
+    .timeline { position: relative; padding-left: 30px; margin-top: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); }
+    .timeline-item { position: relative; margin-bottom: 24px; }
+    .timeline-item::before { content: ''; position: absolute; left: -28px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--orange); border: 2px solid var(--dark); }
+    .timeline-date { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 4px; }
+    .timeline-content { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">👤 Patient Portal</div>
+    <button class="btn-logout" onclick="window.location.href='app.html'">Logout</button>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Hello, Rahul</h1>
+      <p>Here is your current rehabilitation progress and provider updates.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-family: 'Poppins'; color: var(--teal);">Your Care Provider</h3>
+      <div class="doc-info">
+        <div class="doc-avatar">👩‍⚕️</div>
+        <div>
+          <h4 style="font-size: 1.1rem; margin-bottom: 2px;">Dr. Ananya</h4>
+          <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Neuro Rehabilitation Specialist</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3 style="font-family: 'Poppins';">Treatment History</h3>
+      
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">JUNE 20, 2026 • DR. ANANYA</div>
+          <div class="timeline-content">Started using Upper Extremity Feedback System (SY-UEA2). Patient shows 10% improvement in shoulder mobility. Keep up with the daily home stretching!</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">JUNE 15, 2026 • DR. ANANYA</div>
+          <div class="timeline-content">Initial evaluation completed. Muscle strength grade 2. Recommended 3x/week rehab plan starting next Monday.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Phytness Portal</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1A2E35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --teal: #00A3A0;
+      --teal-dark: #007A78;
+      --orange: #F47B20;
+      --dark: #1A2E35;
+      --darker: #0d1a1e;
+      --text: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #0A5055 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background elements */
+    .bg-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      animation: float 10s infinite ease-in-out alternate;
+    }
+    .shape1 { width: 300px; height: 300px; background: rgba(0, 163, 160, 0.2); top: -100px; left: -100px; }
+    .shape2 { width: 250px; height: 250px; background: rgba(244, 123, 32, 0.15); bottom: -50px; right: -50px; animation-delay: -5s; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(30px, 50px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .logo-container {
+      margin-bottom: 40px;
+      text-align: center;
+      animation: fadeInDown 0.8s ease forwards;
+    }
+    .logo-container img {
+      height: 160px; /* Perfectly sized for mobile */
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+    }
+
+    /* Portal Title */
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    p.subtitle {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    /* View states */
+    #selectionView, #loginView {
+      width: 100%;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    
+    #loginView {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    #loginView.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Role Cards */
+    .roles-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .role-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: fadeInUp 0.6s ease forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .role-card:nth-child(1) { animation-delay: 0.1s; }
+    .role-card:nth-child(2) { animation-delay: 0.2s; }
+    .role-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .role-card:hover, .role-card:active {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 163, 160, 0.2);
+    }
+
+    .role-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 163, 160, 0.3);
+    }
+    
+    .role-card.admin .role-icon {
+      background: linear-gradient(135deg, var(--orange) 0%, #d66512 100%);
+      box-shadow: 0 4px 12px rgba(244, 123, 32, 0.3);
+    }
+
+    .role-text h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .role-text p {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .role-arrow {
+      margin-left: auto;
+      color: var(--teal);
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+    .role-card:hover .role-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Login Form (Glassmorphism) */
+    .login-box {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      width: 100%;
+    }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      text-decoration: none;
+      margin-bottom: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: white; }
+
+    .login-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .login-header h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+    }
+    .input-group input {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 14px 16px;
+      border-radius: 10px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .input-group input:focus {
+      border-color: var(--teal);
+      background: rgba(0,0,0,0.4);
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--teal-dark); }
+    .submit-btn:active { transform: scale(0.98); }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape shape1"></div>
+  <div class="bg-shape shape2"></div>
+
+  <div class="container">
+    
+    <!-- Shared Logo -->
+    <div class="logo-container">
+      <img src="logo_transparent.png" alt="Phytness Healthcare">
+    </div>
+
+    <!-- VIEW 1: Role Selection -->
+    <div id="selectionView">
+      <h1>Welcome to Phytness</h1>
+      <p class="subtitle">Please select your portal to continue</p>
+
+      <div class="roles-grid">
+        <div class="role-card" onclick="showLogin('Doctor', '🩺')">
+          <div class="role-icon">🩺</div>
+          <div class="role-text">
+            <h3>Doctor Login</h3>
+            <p>Access patient records & plans</p>
+          </div>
+          <div class="role-arrow">→</div>
+        </div>
+
+        <div class="role-card" onclick="showLogin('Patient', '👤')">
+          <div class="role-icon">👤</div>
+          <div class="role-text">
+            <h3>Patient Login</h3>
+            <p>View your rehab progress</p>
+          </div>
+          <div class="role-arrow">→</div>
+        </div>
+
+        <div class="role-card admin" onclick="showLogin('Admin', '⚙️')">
+          <div class="role-icon">⚙️</div>
+          <div class="role-text">
+            <h3>Admin Login</h3>
+            <p>System & user management</p>
+          </div>
+          <div class="role-arrow" style="color:var(--orange)">→</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: Login Form -->
+    <div id="loginView">
+      <div class="login-box">
+        <a class="back-btn" onclick="showSelection()">← Back to roles</a>
+        
+        <div class="login-header">
+          <div class="role-icon" id="loginIcon" style="width:40px;height:40px;font-size:18px;">🩺</div>
+          <h2 id="loginTitle">Doctor Login</h2>
+        </div>
+
+        <form id="loginForm">
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="emailInput" placeholder="Enter your email" required>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="passwordInput" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('SW registered!', reg);
+        }).catch(err => console.log('SW registration failed', err));
+      });
+    }
+
+    // UI Logic
+    let currentRole = '';
+    const selectionView = document.getElementById('selectionView');
+    const loginView = document.getElementById('loginView');
+    const loginTitle = document.getElementById('loginTitle');
+    const loginIcon = document.getElementById('loginIcon');
+
+    window.showLogin = function(role, icon) {
+      currentRole = role;
+      // Update form header
+      loginTitle.innerText = `${role} Login`;
+      loginIcon.innerText = icon;
+      
+      // Update color theme based on role
+      if(role === 'Admin') {
+        loginIcon.style.background = 'linear-gradient(135deg, var(--orange) 0%, #d66512 100%)';
+      } else {
+        loginIcon.style.background = 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)';
+      }
+
+      // Transition
+      selectionView.style.opacity = '0';
+      selectionView.style.transform = 'translateY(-20px)';
+      
+      setTimeout(() => {
+        selectionView.style.display = 'none';
+        loginView.style.display = 'block';
+        // Trigger reflow
+        void loginView.offsetWidth;
+        loginView.classList.add('active');
+      }, 400);
+    };
+
+    window.showSelection = function() {
+      loginView.classList.remove('active');
+      loginView.style.opacity = '0';
+      loginView.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        loginView.style.display = 'none';
+        selectionView.style.display = 'block';
+        // Trigger reflow
+        void selectionView.offsetWidth;
+        selectionView.style.opacity = '1';
+        selectionView.style.transform = 'translateY(0)';
+      }, 400);
+    };
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('submitBtn');
+      const originalText = btn.innerText;
+      
+      btn.innerText = 'Authenticating...';
+      btn.style.opacity = '0.8';
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error_description || data.msg || 'Login failed');
+        }
+        
+        btn.innerText = '✓ Success!';
+        btn.style.background = '#27ae60';
+        btn.style.opacity = '1';
+        
+        // Redirect based on role
+        setTimeout(() => {
+          if (currentRole === 'Admin') window.location.href = 'dashboard-admin.html';
+          else if (currentRole === 'Doctor') window.location.href = 'dashboard-doctor.html';
+          else window.location.href = 'dashboard-patient.html';
+        }, 800);
+        
+      } catch (err) {
+        alert("Login failed: " + err.message);
+        btn.innerText = originalText;
+        btn.style.opacity = '1';
+      }
+    });
+  </script>
+</body>
+</html>

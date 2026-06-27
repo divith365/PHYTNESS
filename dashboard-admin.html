@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Phytness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal: #00A3A0; --teal-dark: #007A78; --orange: #F47B20;
+      --dark: #1A2E35; --darker: #0d1a1e; --text: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--text); min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(0,0,0,0.4); padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-brand { font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--orange); display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+    
+    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .header h1 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+    
+    .btn-primary { background: var(--teal); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-primary:hover { background: var(--teal-dark); }
+    
+    .card {
+      background: var(--glass-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px;
+      margin-bottom: 24px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+    th { color: rgba(255,255,255,0.6); font-weight: 500; }
+    .tag { background: rgba(0,163,160,0.2); color: #4DD6D4; padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">⚙️ Admin Portal</div>
+    <button class="btn-logout" onclick="window.location.href='app.html'">Logout</button>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Hospital Overview</h1>
+      <button class="btn-primary" onclick="alert('This will open a modal to add a new patient to the database.')">+ Add New Patient</button>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-family: 'Poppins'">Patient Directory</h3>
+        <input type="text" placeholder="Search by ID, Name, or Phone..." style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; width: 300px; outline: none;">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Age / Gender</th>
+            <th>Assigned Doctor</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Rahul Sharma</strong><br><span style="font-size:0.75rem; color:rgba(255,255,255,0.6)">ID: PT-1042</span></td>
+            <td>45 / M</td>
+            <td>Dr. Ananya (Neuro)</td>
+            <td><span class="tag">Active Rehab</span></td>
+            <td>
+              <a href="#" style="color:var(--teal); margin-right: 12px;">Edit</a>
+              <a href="#" style="color:var(--orange);" onclick="confirm('Are you sure you want to delete patient Rahul Sharma?')">Delete</a>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Priya Patel</strong><br><span style="font-size:0.75rem; color:rgba(255,255,255,0.6)">ID: PT-1043</span></td>
+            <td>32 / F</td>
+            <td>Dr. Vikram (Physio)</td>
+            <td><span class="tag">Evaluation</span></td>
+            <td>
+              <a href="#" style="color:var(--teal); margin-right: 12px;">Edit</a>
+              <a href="#" style="color:var(--orange);" onclick="confirm('Are you sure you want to delete patient Priya Patel?')">Delete</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

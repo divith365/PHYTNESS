@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard - Phytness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal: #00A3A0; --teal-dark: #007A78; --orange: #F47B20;
+      --dark: #1A2E35; --darker: #0d1a1e; --text: #ffffff;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--text); min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(0,0,0,0.4); padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .nav-brand { font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--teal); display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+    
+    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .header { margin-bottom: 30px; }
+    .header h1 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+    .header p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+    
+    .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+    @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    
+    .card {
+      background: var(--glass-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px;
+    }
+    
+    .patient-list { list-style: none; margin-top: 16px; }
+    .patient-item { 
+      padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); 
+      cursor: pointer; transition: background 0.2s; border-radius: 8px;
+    }
+    .patient-item:hover { background: rgba(255,255,255,0.05); }
+    .patient-item.active { background: rgba(0,163,160,0.2); border: 1px solid var(--teal); }
+    
+    .note-box { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+    .note-date { font-size: 0.75rem; color: var(--orange); font-weight: 600; margin-bottom: 4px; }
+    
+    .input-area { margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; }
+    textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 12px; color: white; min-height: 100px; margin-bottom: 12px; }
+    .btn-primary { background: var(--teal); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">🩺 Provider Portal</div>
+    <button class="btn-logout" onclick="window.location.href='app.html'">Logout</button>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Welcome, Dr. Ananya</h1>
+      <p>Here are your assigned patients for today.</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3 style="font-family: 'Poppins'; margin-bottom: 12px;">My Patients</h3>
+        <input type="text" placeholder="Search by ID, Name or Phone..." style="width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; outline: none; font-family: 'Inter', sans-serif;">
+        <ul class="patient-list">
+          <li class="patient-item active">
+            <strong>Rahul Sharma</strong><br>
+            <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Post-Stroke Rehab</span>
+          </li>
+          <li class="patient-item">
+            <strong>Amit Kumar</strong><br>
+            <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Gait Training</span>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <h2 style="font-family: 'Poppins'; margin-bottom: 4px;">Rahul Sharma</h2>
+        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 24px;">Age: 45 | Assigned: June 15, 2026</p>
+        
+        <div class="note-box">
+          <div class="note-date">JUNE 20, 2026</div>
+          <p style="font-size: 0.9rem">Started using Upper Extremity Feedback System (SY-UEA2). Patient shows 10% improvement in shoulder mobility.</p>
+        </div>
+        <div class="note-box">
+          <div class="note-date">JUNE 15, 2026</div>
+          <p style="font-size: 0.9rem">Initial evaluation completed. Muscle strength grade 2. Recommended 3x/week rehab plan.</p>
+        </div>
+        
+        <div class="input-area">
+          <h4 style="margin-bottom: 10px;">Add New Progress Note</h4>
+          <textarea placeholder="Enter treatment notes, exercises performed, and progress updates..."></textarea>
+          <button class="btn-primary" onclick="alert('Note added to patient database!')">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
