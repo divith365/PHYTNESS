@@ -20,16 +20,16 @@
       --teal: #00A3A0;
       --teal-dark: #007A78;
       --orange: #F47B20;
-      --dark: #1A2E35;
-      --darker: #0d1a1e;
-      --text: #ffffff;
-      --glass-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.15);
+      --dark: #ffffff;
+      --darker: #f5f7fa;
+      --text: #1A2E35;
+      --glass-bg: rgba(0, 0, 0, 0.04);
+      --glass-border: rgba(0, 0, 0, 0.1);
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #0A5055 100%);
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #e0eceb 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -90,7 +90,7 @@
     }
     p.subtitle {
       font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(0, 0, 0, 0.6);
       margin-bottom: 40px;
       text-align: center;
     }
@@ -141,10 +141,10 @@
     .role-card:nth-child(3) { animation-delay: 0.3s; }
 
     .role-card:hover, .role-card:active {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.08);
       border-color: var(--teal);
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(0, 163, 160, 0.2);
+      box-shadow: 0 10px 24px rgba(0, 163, 160, 0.15);
     }
 
     .role-icon {
@@ -173,7 +173,7 @@
     }
     .role-text p {
       font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(0, 0, 0, 0.6);
     }
     
     .role-arrow {
@@ -201,14 +201,14 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.6);
       font-size: 0.85rem;
       text-decoration: none;
       margin-bottom: 24px;
       cursor: pointer;
       transition: color 0.2s;
     }
-    .back-btn:hover { color: white; }
+    .back-btn:hover { color: black; }
 
     .login-header {
       display: flex;
@@ -216,7 +216,7 @@
       gap: 12px;
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     .login-header h2 {
       font-family: 'Poppins', sans-serif;
@@ -230,16 +230,16 @@
     .input-group label {
       display: block;
       font-size: 0.8rem;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.7);
       margin-bottom: 8px;
     }
     .input-group input {
       width: 100%;
-      background: rgba(0,0,0,0.2);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(0,0,0,0.15);
       padding: 14px 16px;
       border-radius: 10px;
-      color: white;
+      color: #1A2E35;
       font-family: 'Inter', sans-serif;
       font-size: 0.95rem;
       outline: none;
@@ -247,7 +247,7 @@
     }
     .input-group input:focus {
       border-color: var(--teal);
-      background: rgba(0,0,0,0.4);
+      background: #ffffff;
     }
 
     .submit-btn {
@@ -325,7 +325,7 @@
       </div>
       
       <div style="margin-top: 24px; text-align: center;">
-        <span onclick="showLogin('Admin', '⚙️')" style="color: rgba(255,255,255,0.4); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Admin</span>
+        <span onclick="showLogin('Admin', '⚙️')" style="color: rgba(0,0,0,0.4); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='black'" onmouseout="this.style.color='rgba(0,0,0,0.4)'">Admin</span>
       </div>
     </div>
 
