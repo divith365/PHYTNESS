@@ -91,7 +91,7 @@
     <div class="header">
       <h1>Hospital Overview</h1>
       <div style="display: flex; gap: 12px;">
-        <button class="btn-primary" onclick="document.getElementById('addDoctorModal').classList.add('active')" style="background: var(--orange);">+ Add Therapist</button>
+        <button class="btn-primary" onclick="document.getElementById('addDoctorModal').classList.add('active')" style="background: var(--orange);">+ Add Therapist / Staff</button>
         <button class="btn-primary" onclick="document.getElementById('addPatientModal').classList.add('active')">+ Add Patient</button>
       </div>
     </div>
@@ -141,15 +141,24 @@
   <div class="modal-overlay" id="addDoctorModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Add New Therapist</h2>
+        <h2>Add Therapist / Staff</h2>
         <button class="close-btn" onclick="document.getElementById('addDoctorModal').classList.remove('active')">&times;</button>
       </div>
       <form id="addDoctorForm">
-        <div class="form-group">
-          <label>Full Name</label>
-          <div style="display: flex; align-items: center; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
-            <span style="padding: 12px; color: rgba(255,255,255,0.7); border-right: 1px solid rgba(255,255,255,0.1);">Dr.</span>
-            <input type="text" id="docName" required style="border: none; background: transparent; margin: 0; width: 100%;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title</label>
+            <select id="docTitle">
+              <option value="Dr.">Dr.</option>
+              <option value="Mr.">Mr.</option>
+              <option value="Ms.">Ms.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="">(None)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="docName" required>
           </div>
         </div>
         <div class="form-row">
@@ -164,11 +173,11 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Qualification</label>
+            <label>Job Role / Qualification</label>
             <select id="docQual">
-              <option value="BPT">BPT</option>
-              <option value="MPT">MPT</option>
-              <option value="PhD">PhD</option>
+              <option value="Therapist (BPT)">Therapist (BPT)</option>
+              <option value="Therapist (MPT)">Therapist (MPT)</option>
+              <option value="Staff / Assistant">Staff / Assistant</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -366,8 +375,9 @@
       e.preventDefault();
       
       let name = document.getElementById('docName').value.trim();
-      if (!name.startsWith('Dr.')) {
-        name = 'Dr. ' + name;
+      let title = document.getElementById('docTitle').value;
+      if (title && !name.startsWith(title)) {
+        name = title + ' ' + name;
       }
       
       const payload = {
