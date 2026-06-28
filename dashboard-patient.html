@@ -52,7 +52,10 @@
 <body>
   <nav class="navbar">
     <div class="nav-brand">👤 Patient Portal</div>
-    <button class="btn-logout" onclick="window.location.href='app.html'">Logout</button>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn-logout" onclick="document.getElementById('changePinModal').classList.add('active')" style="background: rgba(0, 163, 160, 0.2); border-color: var(--teal);">Change My PIN</button>
+      <button class="btn-logout" onclick="window.location.href='app.html'">Logout</button>
+    </div>
   </nav>
 
   <div class="container">
@@ -87,5 +90,87 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal styles -->
+  <style>
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--dark); border: 1px solid var(--glass-border);
+      border-radius: 16px; padding: 24px; width: 90%; max-width: 400px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h2 { font-family: 'Poppins', sans-serif; }
+    .close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+      padding: 12px; border-radius: 8px; color: white; font-family: 'Inter', sans-serif;
+    }
+    .btn-primary { background: var(--teal); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  </style>
+
+  <!-- Change PIN Modal -->
+  <div class="modal-overlay" id="changePinModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Change My PIN</h2>
+        <button class="close-btn" onclick="document.getElementById('changePinModal').classList.remove('active')">&times;</button>
+      </div>
+      <form id="changePinForm">
+        <div class="form-group">
+          <label>Your Phone Number</label>
+          <input type="tel" id="pinPhone" required placeholder="To identify your account">
+        </div>
+        <div class="form-group">
+          <label>Old PIN</label>
+          <input type="password" id="pinOld" required placeholder="Enter current PIN">
+        </div>
+        <div class="form-group">
+          <label>New PIN</label>
+          <input type="password" id="pinNew" required placeholder="Enter new PIN">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Update PIN</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('changePinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        target_role: 'Patient',
+        target_phone: document.getElementById('pinPhone').value,
+        old_pin: document.getElementById('pinOld').value,
+        new_pin: document.getElementById('pinNew').value
+      };
+      
+      const btn = e.target.querySelector('button');
+      const origText = btn.innerText;
+      btn.innerText = 'Updating...';
+      
+      try {
+        const res = await fetch('/api/change_pin', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to update PIN');
+        alert('PIN updated successfully!');
+        document.getElementById('changePinModal').classList.remove('active');
+        e.target.reset();
+      } catch(err) {
+        alert(err.message);
+      } finally {
+        btn.innerText = origText;
+      }
+    });
+  </script>
 </body>
 </html>
