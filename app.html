@@ -295,11 +295,20 @@
       <p class="subtitle">Please select your portal to continue</p>
 
       <div class="roles-grid">
-        <div class="role-card" onclick="showLogin('Doctor', '🩺')">
+        <div class="role-card" onclick="showLogin('Doctor', '🩺', 'Therapist')">
           <div class="role-icon">🩺</div>
           <div class="role-text">
-            <h3 style="font-size: 1rem;">Therapist / Staff Login</h3>
+            <h3>Therapist Login</h3>
             <p>Access patient records & plans</p>
+          </div>
+          <div class="role-arrow">→</div>
+        </div>
+
+        <div class="role-card" onclick="showLogin('Doctor', '📋', 'Staff')">
+          <div class="role-icon">📋</div>
+          <div class="role-text">
+            <h3>Staff Login</h3>
+            <p>Manage appointments & records</p>
           </div>
           <div class="role-arrow">→</div>
         </div>
@@ -362,10 +371,10 @@
     const loginTitle = document.getElementById('loginTitle');
     const loginIcon = document.getElementById('loginIcon');
 
-    window.showLogin = function(role, icon) {
+    window.showLogin = function(role, icon, displayLabel) {
       currentRole = role;
       // Update form header
-      loginTitle.innerText = `${role} Login`;
+      loginTitle.innerText = `${displayLabel || role} Login`;
       loginIcon.innerText = icon;
       
       // Update color theme based on role
