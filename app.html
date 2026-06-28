@@ -445,9 +445,9 @@
         
         // Redirect based on role
         setTimeout(() => {
-          if (currentRole === 'Admin') window.location.href = 'dashboard-admin.html';
-          else if (currentRole === 'Doctor') window.location.href = 'dashboard-doctor.html';
-          else window.location.href = 'dashboard-patient.html';
+          if (currentRole === 'Admin') window.location.href = 'dashboard-admin';
+          else if (currentRole === 'Doctor') window.location.href = 'dashboard-doctor';
+          else window.location.href = 'dashboard-patient';
         }, 800);
         
       } catch (err) {
