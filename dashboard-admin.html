@@ -106,7 +106,7 @@
           <tr>
             <th>Patient Name</th>
             <th>Age / Gender</th>
-            <th>Assigned Doctor</th>
+            <th>Assigned Therapist</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -297,7 +297,7 @@
         <div class="form-group">
           <label>Target User Role</label>
           <select id="pinRole">
-            <option value="Doctor">Doctor</option>
+            <option value="Doctor">Therapist / Staff</option>
             <option value="Patient">Patient</option>
             <option value="Admin">Admin</option>
           </select>
@@ -391,7 +391,7 @@
         });
         const data = await res.json();
         if(!res.ok) throw new Error(data.error || 'Failed to save');
-        alert('Doctor added successfully!');
+        alert('Therapist/Staff added successfully!');
         document.getElementById('addDoctorModal').classList.remove('active');
         e.target.reset();
       } catch(err) {
