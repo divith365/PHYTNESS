@@ -325,7 +325,7 @@
       </div>
       
       <div style="margin-top: 24px; text-align: center;">
-        <span onclick="showLogin('Admin', '⚙️')" style="color: rgba(0,0,0,0.4); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='black'" onmouseout="this.style.color='rgba(0,0,0,0.4)'">Admin</span>
+        <span onclick="showLogin('Admin', '⚙️')" style="color: rgba(0,0,0,0.4); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='black'" onmouseout="this.style.color='rgba(0,0,0,0.4)'">Admin Login</span>
       </div>
     </div>
 
@@ -356,12 +356,12 @@
   </div>
 
   <script>
-    // Register Service Worker for PWA
+    // Unregister Service Worker to prevent PWA caching issues during development
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-          console.log('SW registered!', reg);
-        }).catch(err => console.log('SW registration failed', err));
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister();
+        }
       });
     }
 
