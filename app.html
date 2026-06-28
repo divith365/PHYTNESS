@@ -298,7 +298,7 @@
         <div class="role-card" onclick="showLogin('Doctor', '🩺')">
           <div class="role-icon">🩺</div>
           <div class="role-text">
-            <h3>Doctor Login</h3>
+            <h3 style="font-size: 1rem;">Therapist / Staff Login</h3>
             <p>Access patient records & plans</p>
           </div>
           <div class="role-arrow">→</div>
@@ -312,15 +312,10 @@
           </div>
           <div class="role-arrow">→</div>
         </div>
-
-        <div class="role-card admin" onclick="showLogin('Admin', '⚙️')">
-          <div class="role-icon">⚙️</div>
-          <div class="role-text">
-            <h3>Admin Login</h3>
-            <p>System & user management</p>
-          </div>
-          <div class="role-arrow" style="color:var(--orange)">→</div>
-        </div>
+      </div>
+      
+      <div style="margin-top: 24px; text-align: center;">
+        <a href="#" onclick="showLogin('Admin', '⚙️'); return false;" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Admin</a>
       </div>
     </div>
 
