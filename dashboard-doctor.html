@@ -142,7 +142,7 @@
       <form id="changePinForm">
         <div class="form-group">
           <label>Your Phone Number</label>
-          <input type="tel" id="pinPhone" required placeholder="To identify your account">
+          <input type="tel" id="pinPhone" required pattern="[0-9]{10}" maxlength="10" title="Please enter a 10-digit phone number" placeholder="To identify your account">
         </div>
         <div class="form-group">
           <label>Old PIN</label>
