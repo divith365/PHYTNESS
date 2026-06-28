@@ -34,11 +34,11 @@
     border-bottom: 1px solid var(--border);
     padding: 0 5%;
     display: flex; align-items: center; justify-content: space-between;
-    height: 68px;
+    height: 75px;
     transition: box-shadow 0.3s;
   }
   nav.scrolled { box-shadow: var(--shadow); }
-  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo { display: flex; align-items: flex-start; gap: 12px; text-decoration: none; align-self: flex-start; margin-top: -60px; }
   .logo-mark {
     width: 40px; height: 40px; background: var(--teal); border-radius: 8px;
     display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px;
@@ -60,7 +60,7 @@
 
   /* HERO */
   .hero {
-    min-height: 100vh; padding-top: 68px;
+    min-height: 100vh; padding-top: 75px;
     display: grid; grid-template-columns: 1fr 1fr;
     align-items: center;
     background: linear-gradient(135deg, var(--dark) 0%, #0D3D4A 60%, #0A5055 100%);
@@ -264,12 +264,12 @@
   .footer-col ul li { margin-bottom: 9px; }
   .footer-col ul a { color: rgba(255,255,255,0.55); font-size: 0.84rem; text-decoration: none; transition: color 0.2s; }
   .footer-col ul a:hover { color: var(--teal); }
-  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; font-size: 0.8rem; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
   .footer-bottom a { color: var(--teal); text-decoration: none; }
 
   /* MOBILE NAV */
   .mobile-menu {
-    display: none; position: fixed; top: 68px; left: 0; right: 0; bottom: 0; z-index: 99;
+    display: none; position: fixed; top: 75px; left: 0; right: 0; bottom: 0; z-index: 99;
     background: white; padding: 32px 5%; flex-direction: column; gap: 24px;
   }
   .mobile-menu.open { display: flex; }
@@ -301,24 +301,42 @@
   /* SCROLL REVEAL */
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .reveal.visible { opacity: 1; transform: none; }
+  /* PRELOADER & SCROLL PROGRESS */
+  #preloader {
+    position: fixed; inset: 0; background: var(--white); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  .spinner {
+    width: 50px; height: 50px; border: 4px solid var(--border);
+    border-top-color: var(--teal); border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  body.loaded #preloader { opacity: 0; visibility: hidden; }
+
+  .scroll-progress-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+    background: transparent; z-index: 10000; pointer-events: none;
+  }
+  .scroll-progress-bar { height: 4px; background: var(--orange); width: 0%; transition: width 0.1s; }
 </style>
 </head>
 <body>
 
+<!-- PRELOADER -->
+<div id="preloader"><div class="spinner"></div></div>
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollBar"></div></div>
+
 <!-- NAV -->
 <nav id="nav">
   <a href="#" class="nav-logo">
-    <div class="logo-mark">P</div>
-    <div>
-      <div class="logo-text">PHYTNESS <span>HEALTHCARE</span></div>
-      <div class="logo-sub">Rehabilitation Experts</div>
-    </div>
+    <img src="logo_transparent.png" alt="Phytness Healthcare Logo" style="height: 194px; width: auto; max-width: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));">
   </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#products">Products</a></li>
-    <li><a href="neuro-rehab.html">Neuro Rehab</a></li>
-    <li><a href="physiotherapy.html">Physio</a></li>
     <li><a href="#why">Why Us</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -331,12 +349,8 @@
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
   <a href="#about" onclick="toggleMenu()">About Us</a>
-  <a href="#products" onclick="toggleMenu()">All Products</a>
-  <a href="neuro-rehab.html" onclick="toggleMenu()">Neuro Rehab Equipment</a>
-  <a href="physiotherapy.html" onclick="toggleMenu()">Physiotherapy Equipment</a>
-  <a href="occupational-therapy.html" onclick="toggleMenu()">Occupational Therapy</a>
-  <a href="pediatric-rehab.html" onclick="toggleMenu()">Pediatric Rehab</a>
-  <a href="hospital-furniture.html" onclick="toggleMenu()">Hospital Furniture</a>
+  <a href="#products" onclick="toggleMenu()">Products</a>
+  <a href="#why" onclick="toggleMenu()">Why Phytness</a>
   <a href="#contact" onclick="toggleMenu()">Contact & Enquiry</a>
   <a href="tel:+919449806682" style="color:#00A3A0">📞 +91 94498 06682</a>
 </div>
@@ -352,9 +366,9 @@
       <a href="#contact" class="btn-secondary">Request a Demo</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="num">68+</div><div class="lbl">Product Models</div></div>
-      <div class="hero-stat"><div class="num">5</div><div class="lbl">Product Categories</div></div>
-      <div class="hero-stat"><div class="num">4</div><div class="lbl">Cities Served</div></div>
+      <div class="hero-stat"><div class="num"><span class="counter" data-target="68">0</span>+</div><div class="lbl">Product Models</div></div>
+      <div class="hero-stat"><div class="num"><span class="counter" data-target="5">0</span></div><div class="lbl">Product Categories</div></div>
+      <div class="hero-stat"><div class="num"><span class="counter" data-target="4">0</span></div><div class="lbl">Cities Served</div></div>
     </div>
   </div>
   <div class="hero-visual">
@@ -424,13 +438,6 @@
   <h2>Comprehensive Product Categories</h2>
   <p class="lead">From advanced neuro rehabilitation robots to basic physiotherapy consumables — we cover every need of modern rehabilitation centres and hospitals.</p>
 
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;margin-top:32px;">
-    <a href="neuro-rehab.html" style="background:var(--teal-light);color:var(--teal);padding:10px 18px;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;border:1px solid var(--border);">Neuro Rehab →</a>
-    <a href="physiotherapy.html" style="background:var(--teal-light);color:var(--teal);padding:10px 18px;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;border:1px solid var(--border);">Physiotherapy →</a>
-    <a href="occupational-therapy.html" style="background:var(--teal-light);color:var(--teal);padding:10px 18px;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;border:1px solid var(--border);">Occupational Therapy →</a>
-    <a href="pediatric-rehab.html" style="background:var(--teal-light);color:var(--teal);padding:10px 18px;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;border:1px solid var(--border);">Pediatric Rehab →</a>
-    <a href="hospital-furniture.html" style="background:var(--teal-light);color:var(--teal);padding:10px 18px;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;border:1px solid var(--border);">Hospital Furniture →</a>
-  </div>
   <div class="cat-filter">
     <button class="cat-btn active" onclick="filterCat('all', this)">All Products</button>
     <button class="cat-btn" onclick="filterCat('neuro', this)">Neuro Rehab</button>
@@ -449,7 +456,7 @@
       <div class="prod-body">
         <h3>Gait Training & Evaluation System</h3>
         <p>Based on neural plasticity principles — simulates real walking mechanics with mechanical leg support, restoring normal walking function in neurological patients.</p>
-        <a href="neuro-rehab.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="neuro">
@@ -460,7 +467,7 @@
       <div class="prod-body">
         <h3>Upper Extremity Feedback Training & Evaluation System</h3>
         <p>Ergonomic upper limb weight reduction manipulator with incentive feedback games and standardized evaluation tools for upper limb and brain recovery.</p>
-        <a href="neuro-rehab.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="neuro">
@@ -471,7 +478,7 @@
       <div class="prod-body">
         <h3>Lower Extremity Feedback Training System (ZEPU-X8)</h3>
         <p>Multi-integrated intelligent rehabilitation system for functional gait reconstruction in ultra-early bedridden patients — active, passive, and electric standing modes.</p>
-        <a href="neuro-rehab.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="neuro">
@@ -482,7 +489,7 @@
       <div class="prod-body">
         <h3>Multifunctional System for Hand Training (AE-SG1)</h3>
         <p>12 types of hand function training programs — improves hand movement control, muscle strength, proprioception, and joint mobility. Treats up to 4 patients simultaneously.</p>
-        <a href="neuro-rehab.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="physio">
@@ -493,7 +500,7 @@
       <div class="prod-body">
         <h3>TECAR Therapy & Electrotherapy Devices</h3>
         <p>Advanced TECAR therapy, IFT, Ultrasound therapy (1 & 3 MHz), TENS devices, traction units, and combination therapy devices for comprehensive electrotherapy.</p>
-        <a href="physiotherapy.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="physio">
@@ -504,7 +511,7 @@
       <div class="prod-body">
         <h3>Electrotherapy Range — IFT, TENS, MS & Ultrasound</h3>
         <p>Electrophyt IFT (150 programs), Ultraphyt Plus ultrasound, Perfect TENS 4-CH device, INTERSTAT traction system, DUOPHYT TENS/EMS and Cryo Air Therapy.</p>
-        <a href="physiotherapy.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="ot">
@@ -515,7 +522,7 @@
       <div class="prod-body">
         <h3>Advanced Training Stair (MSR-PRO)</h3>
         <p>3-in-1 stair, slope, and parallel bars system for ADL training — height adjustable, fire retardant PVC treads, 400 kg static load capacity.</p>
-        <a href="occupational-therapy.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="ot">
@@ -526,7 +533,7 @@
       <div class="prod-body">
         <h3>Upper Limb Rehabilitation Robot (SY-UEA2)</h3>
         <p>CE, FDA & ISO certified robotic arm for stroke, brain injury, cerebral palsy, and Parkinson's patients. Intelligent data analysis, multi-dimensional training modes.</p>
-        <a href="occupational-therapy.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="pediatric">
@@ -537,7 +544,7 @@
       <div class="prod-body">
         <h3>Perturbation Training Board & Sensory Integration</h3>
         <p>Improves balance, neuromuscular coordination, and body regulation in children. Suitable for autism, pervasive developmental disorders, and central nervous system coordination issues.</p>
-        <a href="pediatric-rehab.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
     <div class="prod-card reveal" data-cat="hospital">
@@ -548,7 +555,7 @@
       <div class="prod-body">
         <h3>Clinical Furniture & Therapy Tables</h3>
         <p>Chiropractic tables, Electric Bobath tables, Saddle chairs, Swivel stools, Surgeon therapy chairs, Inversion tables, and Rehab suspension units — all clinically graded.</p>
-        <a href="hospital-furniture.html" class="prod-link">View All Products →</a>
+        <a href="#contact" class="prod-link">Enquire Now →</a>
       </div>
     </div>
   </div>
@@ -695,11 +702,11 @@
     <div class="footer-col">
       <h5>Products</h5>
       <ul>
-        <li><a href="neuro-rehab.html">Neuro Rehab Equipment</a></li>
-        <li><a href="physiotherapy.html">Physiotherapy Equipment</a></li>
-        <li><a href="occupational-therapy.html">Occupational Therapy</a></li>
-        <li><a href="pediatric-rehab.html">Pediatric Rehab</a></li>
-        <li><a href="hospital-furniture.html">Hospital Furniture</a></li>
+        <li><a href="#products">Neuro Rehab Equipment</a></li>
+        <li><a href="#products">Physiotherapy Equipment</a></li>
+        <li><a href="#products">Occupational Therapy</a></li>
+        <li><a href="#products">Pediatric Rehab</a></li>
+        <li><a href="#products">Hospital Furniture</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -713,16 +720,58 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 Phytness Healthcare. All rights reserved.</span>
-    <span>Bangalore | Hubli | Mumbai | Pune</span>
+    <div class="fb-left" style="margin-bottom: 10px;">
+      <span>© 2025 Phytness Healthcare. All rights reserved.</span>
+      <span style="margin-left: 10px; color: var(--orange); font-weight: 600;">Bangalore | Hubli | Mumbai | Pune</span>
+    </div>
+    <div class="fb-right" style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">
+      ✦ by <a href="https://trustwork.co.in" target="_blank" style="color: rgba(255,255,255,0.7); text-decoration: none;">trustwork.co.in</a> &nbsp;|&nbsp; 📞 +91 93530 10107 &nbsp;|&nbsp; 📧 support@trustwork.co.in
+    </div>
   </div>
 </footer>
 
 <script>
-// NAV scroll
+// Preloader
+window.addEventListener('load', () => {
+  setTimeout(() => { document.body.classList.add('loaded'); }, 500);
+});
+
+// NAV & Scroll Progress
 window.addEventListener('scroll', () => {
   document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+  
+  // Scroll Progress Bar
+  let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  let scrolled = (winScroll / height) * 100;
+  document.getElementById("scrollBar").style.width = scrolled + "%";
 });
+
+// Counter Animation
+const counters = document.querySelectorAll('.counter');
+const counterObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const counter = entry.target;
+      const target = +counter.getAttribute('data-target');
+      // For smaller numbers like 4 and 5, we adjust the increment so it doesn't instantly jump
+      const inc = target < 10 ? 1 : target / 50; 
+      
+      const updateCount = () => {
+        const count = +counter.innerText;
+        if (count < target) {
+          counter.innerText = Math.ceil(count + inc);
+          setTimeout(updateCount, 30);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
+      obs.unobserve(counter);
+    }
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => counterObserver.observe(c));
 
 // Mobile menu
 function toggleMenu() {
