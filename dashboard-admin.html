@@ -119,7 +119,7 @@
             <td><span class="tag">Active Rehab</span></td>
             <td>
               <a href="#" style="color:var(--teal); margin-right: 12px;">Edit</a>
-              <a href="#" style="color:var(--orange);" onclick="confirm('Are you sure you want to delete patient Rahul Sharma?')">Delete</a>
+              <a href="#" style="color:var(--orange);" onclick="deletePatient('PT-1042', 'Rahul Sharma')">Delete</a>
             </td>
           </tr>
           <tr>
@@ -129,7 +129,7 @@
             <td><span class="tag">Evaluation</span></td>
             <td>
               <a href="#" style="color:var(--teal); margin-right: 12px;">Edit</a>
-              <a href="#" style="color:var(--orange);" onclick="confirm('Are you sure you want to delete patient Priya Patel?')">Delete</a>
+              <a href="#" style="color:var(--orange);" onclick="deletePatient('PT-1043', 'Priya Patel')">Delete</a>
             </td>
           </tr>
         </tbody>
@@ -263,9 +263,11 @@
             <input type="text" id="patDuration">
           </div>
           <div class="form-group">
-            <label>Assigned Doctor (ID)</label>
-            <!-- In a real app, this would be populated from the database -->
-            <input type="text" id="patDocId" placeholder="e.g. uuid-of-doctor">
+            <label>Assigned Therapist</label>
+            <select id="patDocId">
+              <option value="">Unassigned</option>
+              <!-- Will be populated by JS -->
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -333,8 +335,9 @@
         target_phone: document.getElementById('pinPhone').value,
         new_pin: document.getElementById('pinNew').value,
         is_admin_override: true,
-        admin_phone: document.getElementById('adminPhone').value,
-        admin_pin: document.getElementById('adminPin').value
+        override_role: 'Admin',
+        override_phone: document.getElementById('adminPhone').value,
+        override_pin: document.getElementById('adminPin').value
       };
       
       const btn = e.target.querySelector('button');
@@ -440,6 +443,51 @@
         alert(err.message);
       } finally {
         btn.innerText = origText;
+      }
+    });
+
+    async function deletePatient(id, name) {
+      const adminPhone = prompt(`To delete patient ${name}, enter your Admin Phone Number:`);
+      if (!adminPhone) return;
+      const adminPin = prompt(`Enter Admin PIN to authorize deletion:`);
+      if (!adminPin) return;
+
+      try {
+        const res = await fetch('/api/delete_patient', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            patient_id: id,
+            override_role: 'Admin',
+            override_phone: adminPhone,
+            override_pin: adminPin
+          })
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to delete');
+        alert('Patient deleted successfully!');
+        // In a real app, you would reload or remove the row from DOM here
+      } catch(err) {
+        alert(err.message);
+      }
+    }
+
+    // On Load, fetch therapists for the Add Patient dropdown
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/list_doctors');
+        if (res.ok) {
+          const doctors = await res.json();
+          const select = document.getElementById('patDocId');
+          doctors.forEach(doc => {
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = doc.full_name;
+            select.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load therapists', err);
       }
     });
   </script>

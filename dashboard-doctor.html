@@ -66,9 +66,12 @@
   </nav>
 
   <div class="container">
-    <div class="header">
-      <h1>Welcome, Dr. Ananya</h1>
-      <p>Here are your assigned patients for today.</p>
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>Welcome, Dr. Ananya</h1>
+        <p>Here are your assigned patients for today.</p>
+      </div>
+      <button class="btn-primary" onclick="document.getElementById('addPatientModal').classList.add('active')">+ Add Patient</button>
     </div>
 
     <div class="grid">
@@ -77,12 +80,28 @@
         <input type="text" placeholder="Search by ID, Name or Phone..." style="width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; outline: none; font-family: 'Inter', sans-serif;">
         <ul class="patient-list">
           <li class="patient-item active">
-            <strong>Rahul Sharma</strong><br>
-            <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Post-Stroke Rehab</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong>Rahul Sharma</strong><br>
+                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Post-Stroke Rehab</span>
+              </div>
+              <div style="text-align: right;">
+                <a href="#" style="color:var(--teal); font-size: 0.85rem; margin-right: 12px;" onclick="document.getElementById('resetPatientPinModal').classList.add('active'); event.stopPropagation();">Reset PIN</a>
+                <a href="#" style="color:var(--orange); font-size: 0.85rem;" onclick="deletePatient('PT-1042', 'Rahul Sharma'); event.stopPropagation();">Delete</a>
+              </div>
+            </div>
           </li>
           <li class="patient-item">
-            <strong>Amit Kumar</strong><br>
-            <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Gait Training</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong>Amit Kumar</strong><br>
+                <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6)">Gait Training</span>
+              </div>
+              <div style="text-align: right;">
+                <a href="#" style="color:var(--teal); font-size: 0.85rem; margin-right: 12px;" onclick="document.getElementById('resetPatientPinModal').classList.add('active'); event.stopPropagation();">Reset PIN</a>
+                <a href="#" style="color:var(--orange); font-size: 0.85rem;" onclick="deletePatient('PT-1043', 'Amit Kumar'); event.stopPropagation();">Delete</a>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
@@ -119,18 +138,152 @@
     .modal-overlay.active { display: flex; }
     .modal-content {
       background: var(--dark); border: 1px solid var(--glass-border);
-      border-radius: 16px; padding: 24px; width: 90%; max-width: 400px;
+      border-radius: 16px; padding: 24px; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto;
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-header h2 { font-family: 'Poppins', sans-serif; }
     .close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+    
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
-    .form-group input {
+    .form-group input:not([type="checkbox"]), .form-group select, .form-group textarea {
       width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
       padding: 12px; border-radius: 8px; color: white; font-family: 'Inter', sans-serif;
     }
+    .form-group input:not([type="checkbox"]):focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--teal); }
+    
+    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 8px; }
+    .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7); cursor: pointer; transition: color 0.2s; }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; margin: 0; }
+    .checkbox-label input[type="checkbox"]:checked + span { color: #4DD6D4; font-weight: 600; }
+    
+    .btn-submit { width: 100%; background: var(--teal); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .btn-submit:hover { background: var(--teal-dark); }
   </style>
+
+  <!-- Add Patient Modal -->
+  <div class="modal-overlay" id="addPatientModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Patient</h2>
+        <button class="close-btn" onclick="document.getElementById('addPatientModal').classList.remove('active')">&times;</button>
+      </div>
+      <form id="addPatientForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="patName" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="patAge" min="1" max="150" required placeholder="Years">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="patGender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="patPhone" required pattern="[0-9]{10}" maxlength="10" title="Please enter a 10-digit phone number" placeholder="10-digit number">
+          </div>
+          <!-- PIN is defaulted to 0000 by the API -->
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" id="patAddress" placeholder="(Optional) Residential Address">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Emergency Contact Name</label>
+            <input type="text" id="patEmName" placeholder="(Optional) Name">
+          </div>
+          <div class="form-group">
+            <label>Emergency Contact Phone</label>
+            <input type="tel" id="patEmPhone" pattern="[0-9]{10}" maxlength="10" title="Please enter a 10-digit phone number" placeholder="(Optional) 10-digit number">
+          </div>
+        </div>
+        
+        <h3 style="margin: 20px 0 10px; font-size: 1rem;">Medical Details</h3>
+        <div class="form-group">
+          <label>Chief Complaint</label>
+          <textarea id="patComplaint" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Diagnosis</label>
+            <input type="text" id="patDiag">
+          </div>
+          <div class="form-group">
+            <label>Affected Body Part</label>
+            <input type="text" id="patBodyPart">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duration of Complaint</label>
+            <input type="text" id="patDuration">
+          </div>
+          <div class="form-group">
+            <label>Assigned Therapist</label>
+            <select id="patDocId">
+              <option value="">Unassigned</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Medical History</label>
+          <div class="checkbox-group">
+            <label class="checkbox-label"><input type="checkbox" value="Diabetes" class="patHistory"> <span>Diabetes</span></label>
+            <label class="checkbox-label"><input type="checkbox" value="Hypertension" class="patHistory"> <span>Hypertension</span></label>
+            <label class="checkbox-label"><input type="checkbox" value="Heart Disease" class="patHistory"> <span>Heart Disease</span></label>
+            <label class="checkbox-label"><input type="checkbox" value="Surgeries" class="patHistory"> <span>Surgeries</span></label>
+            <label class="checkbox-label"><input type="checkbox" value="Fractures" class="patHistory"> <span>Fractures</span></label>
+            <label class="checkbox-label"><input type="checkbox" value="Allergies" class="patHistory"> <span>Allergies</span></label>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Save Patient</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reset Patient PIN Modal -->
+  <div class="modal-overlay" id="resetPatientPinModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Reset Patient PIN</h2>
+        <button class="close-btn" onclick="document.getElementById('resetPatientPinModal').classList.remove('active')">&times;</button>
+      </div>
+      <form id="resetPatientPinForm">
+        <div class="form-group">
+          <label>Patient Phone Number</label>
+          <input type="tel" id="resetPatPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="Patient's phone">
+        </div>
+        <div class="form-group">
+          <label>New PIN for Patient</label>
+          <input type="text" id="resetPatNew" required placeholder="Enter new PIN">
+        </div>
+        <div class="form-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <div class="form-group">
+            <label>Your Phone</label>
+            <input type="tel" id="resetDocPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="To verify authorization">
+          </div>
+          <div class="form-group">
+            <label>Your PIN</label>
+            <input type="password" id="resetDocPin" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" style="background: var(--orange);">Reset Patient PIN</button>
+      </form>
+    </div>
+  </div>
 
   <!-- Change PIN Modal -->
   <div class="modal-overlay" id="changePinModal">
@@ -186,6 +339,127 @@
         alert(err.message);
       } finally {
         btn.innerText = origText;
+      }
+    });
+
+    document.getElementById('resetPatientPinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        target_role: 'Patient',
+        target_phone: document.getElementById('resetPatPhone').value,
+        new_pin: document.getElementById('resetPatNew').value,
+        is_admin_override: true,
+        override_role: 'Doctor',
+        override_phone: document.getElementById('resetDocPhone').value,
+        override_pin: document.getElementById('resetDocPin').value
+      };
+      
+      const btn = e.target.querySelector('button');
+      const origText = btn.innerText;
+      btn.innerText = 'Updating...';
+      
+      try {
+        const res = await fetch('/api/change_pin', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to reset patient PIN');
+        alert('Patient PIN reset successfully!');
+        document.getElementById('resetPatientPinModal').classList.remove('active');
+        e.target.reset();
+      } catch(err) {
+        alert(err.message);
+      } finally {
+        btn.innerText = origText;
+      }
+    });
+
+    document.getElementById('addPatientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const historyCheckboxes = document.querySelectorAll('.patHistory:checked');
+      const medical_history = Array.from(historyCheckboxes).map(cb => cb.value);
+
+      const payload = {
+        full_name: document.getElementById('patName').value,
+        age: parseInt(document.getElementById('patAge').value),
+        gender: document.getElementById('patGender').value,
+        phone: document.getElementById('patPhone').value,
+        address: document.getElementById('patAddress').value,
+        emergency_contact_name: document.getElementById('patEmName').value,
+        emergency_contact_phone: document.getElementById('patEmPhone').value,
+        chief_complaint: document.getElementById('patComplaint').value,
+        diagnosis: document.getElementById('patDiag').value,
+        affected_body_part: document.getElementById('patBodyPart').value,
+        duration: document.getElementById('patDuration').value,
+        medical_history: medical_history,
+        assigned_doctor_id: document.getElementById('patDocId').value || null
+      };
+      
+      const btn = e.target.querySelector('button');
+      const origText = btn.innerText;
+      btn.innerText = 'Saving...';
+      
+      try {
+        const res = await fetch('/api/add_patient', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to save');
+        alert('Patient added successfully!');
+        document.getElementById('addPatientModal').classList.remove('active');
+        e.target.reset();
+      } catch(err) {
+        alert(err.message);
+      } finally {
+        btn.innerText = origText;
+      }
+    });
+
+    async function deletePatient(id, name) {
+      const docPhone = prompt(`To delete patient ${name}, enter your Phone Number:`);
+      if (!docPhone) return;
+      const docPin = prompt(`Enter your PIN to authorize deletion:`);
+      if (!docPin) return;
+
+      try {
+        const res = await fetch('/api/delete_patient', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            patient_id: id,
+            override_role: 'Doctor',
+            override_phone: docPhone,
+            override_pin: docPin
+          })
+        });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Failed to delete');
+        alert('Patient deleted successfully!');
+      } catch(err) {
+        alert(err.message);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/list_doctors');
+        if (res.ok) {
+          const doctors = await res.json();
+          const select = document.getElementById('patDocId');
+          doctors.forEach(doc => {
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = doc.full_name;
+            select.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load therapists', err);
       }
     });
   </script>
