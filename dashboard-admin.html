@@ -123,7 +123,7 @@
           <button class="btn-primary" style="background: #FF5A5F; border-color: #FF5A5F;" onclick="deleteSelectedStaff()">🗑️ Delete Selected</button>
         </div>
         <table>
-          <thead><tr><th style="width: 40px;"><input type="checkbox" id="selectAllStaff" onclick="toggleAllStaffCheckboxes()"></th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead>
+          <thead><tr><th style="width: 40px;">Select</th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead>
           <tbody id="staffTableBody"><tr><td colspan="6" style="text-align:center;">Loading staff...</td></tr></tbody>
         </table>
       </div>
@@ -499,11 +499,6 @@
         }
     };
 
-    window.toggleAllStaffCheckboxes = function() {
-        const checked = document.getElementById('selectAllStaff').checked;
-        document.querySelectorAll('.staff-checkbox').forEach(cb => cb.checked = checked);
-    };
-
     window.deleteSingleStaff = function(id, role, name) {
         showConfirm(`Delete ${name}?`, `Are you sure you want to permanently delete this ${role}?`, () => executeDeleteStaff(role === 'Staff' ? [id] : [], role === 'Doctor' ? [id] : []));
     };
@@ -532,7 +527,6 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
             showToast(`Deleted ${data.deleted} users!`);
-            document.getElementById('selectAllStaff').checked = false;
             loadData();
         } catch(err) {
             alert("Error: " + err.message);
