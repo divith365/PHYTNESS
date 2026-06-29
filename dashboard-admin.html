@@ -185,19 +185,6 @@
           <label>Contact Phone Number (10 digits)</label>
           <input type="tel" id="hospContact" pattern="[0-9]{10}" title="Must be exactly 10 digits" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
         </div>
-        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
-        <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Super Admin Authentication</p>
-        <div class="form-group">
-          <label>Admin Phone</label>
-          <input type="tel" id="hospAdminPhone" required>
-        </div>
-        <div class="form-group">
-          <label>Admin PIN</label>
-          <div style="position: relative;">
-            <input type="password" id="hospAdminPin" required style="padding-right: 40px;">
-            <span onclick="toggleModalPassword('hospAdminPin', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
-          </div>
-        </div>
         <button type="submit" class="btn-submit">Create Hospital</button>
       </form>
     </div>
@@ -227,18 +214,6 @@
         <div class="form-group">
           <label>Phone Number (10 digits)</label>
           <input type="tel" id="staffPhone" pattern="[0-9]{10}" title="Must be exactly 10 digits" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
-        </div>
-        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
-        <div class="form-group">
-          <label>Admin Phone</label>
-          <input type="tel" id="staffAdminPhone" required>
-        </div>
-        <div class="form-group">
-          <label>Admin PIN</label>
-          <div style="position: relative;">
-            <input type="password" id="staffAdminPin" required style="padding-right: 40px;">
-            <span onclick="toggleModalPassword('staffAdminPin', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
-          </div>
         </div>
         <button type="submit" class="btn-submit">Create User</button>
       </form>
@@ -544,8 +519,8 @@
                     name: document.getElementById('hospName').value,
                     prefix: document.getElementById('hospPrefix').value,
                     contact: document.getElementById('hospContact').value,
-                    admin_phone: document.getElementById('hospAdminPhone').value,
-                    admin_pin: document.getElementById('hospAdminPin').value
+                    admin_phone: adminPhone,
+                    admin_pin: adminPin
                 })
             });
             const data = await res.json();
@@ -710,19 +685,20 @@
 
     document.getElementById('addStaffForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const role = document.getElementById('staffRole').value;
+        const endpoint = role === 'Doctor' ? '/api/add_doctor' : '/api/add_staff';
+
         try {
-            const role = document.getElementById('staffRole').value;
-            const endpoint = role === 'Staff' ? '/api/add_staff' : '/api/add_doctor';
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     hospital_id: document.getElementById('staffHospId').value,
-                    role: role,
                     full_name: document.getElementById('staffName').value,
                     phone: document.getElementById('staffPhone').value,
-                    admin_phone: document.getElementById('staffAdminPhone').value,
-                    admin_pin: document.getElementById('staffAdminPin').value
+                    role: role,
+                    admin_phone: adminPhone,
+                    admin_pin: adminPin
                 })
             });
             const data = await res.json();
