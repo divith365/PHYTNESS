@@ -163,7 +163,10 @@
         </div>
         <div class="form-group">
           <label>Admin PIN</label>
-          <input type="password" id="hospAdminPin" required>
+          <div style="position: relative;">
+            <input type="password" id="hospAdminPin" required style="padding-right: 40px;">
+            <span onclick="toggleModalPassword('hospAdminPin', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
+          </div>
         </div>
         <button type="submit" class="btn-submit">Create Hospital</button>
       </form>
@@ -204,7 +207,10 @@
         </div>
         <div class="form-group">
           <label>Admin PIN</label>
-          <input type="password" id="staffAdminPin" required>
+          <div style="position: relative;">
+            <input type="password" id="staffAdminPin" required style="padding-right: 40px;">
+            <span onclick="toggleModalPassword('staffAdminPin', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
+          </div>
         </div>
         <button type="submit" class="btn-submit">Create User</button>
       </form>
@@ -218,7 +224,13 @@
       <form id="authActionForm">
         <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 16px;" id="authActionDesc">Please verify your admin credentials to proceed.</p>
         <div class="form-group"><label>Admin Phone</label><input type="tel" id="actionPhone" required></div>
-        <div class="form-group"><label>Admin PIN</label><input type="password" id="actionPin" required></div>
+        <div class="form-group">
+          <label>Admin PIN</label>
+          <div style="position: relative;">
+            <input type="password" id="actionPin" required style="padding-right: 40px;">
+            <span onclick="toggleModalPassword('actionPin', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
+          </div>
+        </div>
         <button type="submit" class="btn-submit" id="actionBtn">Confirm Action</button>
       </form>
     </div>
@@ -228,6 +240,35 @@
 
   <script>
     let currentPendingAction = null; 
+
+    // Password Toggle
+    window.toggleModalPassword = function(inputId, iconEl) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        iconEl.style.opacity = '1';
+      } else {
+        input.type = 'password';
+        iconEl.style.opacity = '0.5';
+      }
+    };
+
+    // 1-Hour Inactivity Timeout
+    let inactivityTimer;
+    const TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        alert("Session expired due to inactivity (1 hour).");
+        window.location.href = 'index.html';
+      }, TIMEOUT_MS);
+    }
+
+    ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetInactivityTimer);
+    });
+    resetInactivityTimer();
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
