@@ -25,7 +25,7 @@
       background: linear-gradient(135deg, #e0f7f7 0%, #d0e8e8 100%);
       color: var(--text);
       min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10vh;
       overflow-x: hidden; position: relative;
     }
 
@@ -37,7 +37,7 @@
 
     .container { position: relative; z-index: 10; width: 100%; max-width: 440px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; }
 
-    .logo-container { text-align: center; animation: fadeInDown 0.8s ease forwards; margin-bottom: 20px; }
+    .logo-container { text-align: center; animation: fadeInDown 0.8s ease forwards; margin-bottom: 0px; }
     .logo-container svg { width: 64px; height: 64px; color: var(--primary); filter: drop-shadow(0 4px 10px rgba(45, 212, 191, 0.4)); margin-bottom: 10px; }
 
     h1 { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 8px; text-align: center; background: linear-gradient(90deg, #1A2E35, #3D5A62); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -96,7 +96,7 @@
   <div class="container">
     
     <div class="logo-container">
-      <img src="logo_transparent.png" alt="Phytness Healthcare Logo" style="height: 280px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); margin-bottom: 20px;">
+      <img src="logo_transparent.png" alt="Phytness Healthcare Logo" style="height: 280px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1)); margin-bottom: 0px;">
     </div>
 
     <!-- VIEW 1: Role Selection -->
