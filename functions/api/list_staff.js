@@ -1,0 +1,33 @@
+export async function onRequestGet({ request, env }) {
+  try {
+    const url = new URL(request.url);
+    const hospId = url.searchParams.get('hospital_id');
+
+    const SUPABASE_URL = env.SUPABASE_URL || 'https://iwxdrhuzybkccxryekey.supabase.co';
+    const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3eGRyaHV6eWJrY2N4cnlla2V5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjgyODgsImV4cCI6MjA5ODE0NDI4OH0.RrPVtsvbBVtdFsEmwPxBsqDx4laM91W7A9PUgOBlFTo';
+
+    const headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json'
+    };
+
+    let fetchUrl = `${SUPABASE_URL}/rest/v1/staff?select=id,full_name,phone,login_id`;
+    if (hospId) fetchUrl += `&hospital_id=eq.${encodeURIComponent(hospId)}`;
+
+    const res = await fetch(fetchUrl, { headers });
+    const data = await res.json();
+
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message || "Failed to fetch staff" }), { status: res.status });
+    }
+
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+}

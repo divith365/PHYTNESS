@@ -145,17 +145,24 @@
       <button class="btn-primary" onclick="openModal('addPatientModal')">+ Register Patient</button>
     </div>
 
-    <div class="tabs">
+    <div class="tabs" style="display: flex; align-items: center; gap: 10px;">
       <button class="tab active" onclick="switchTab('allPatients', this)">Patient Directory</button>
+      <button class="tab" onclick="switchTab('staffDirectory', this)">Staff Directory</button>
+      <button class="tab" onclick="switchTab('doctorDirectory', this)">Doctors Directory</button>
       <button class="tab" onclick="switchTab('appointments', this)">Appointments / Stats</button>
+      <button class="icon-btn" onclick="refreshCurrentTab()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; margin-left: auto;" title="Refresh">↻</button>
     </div>
 
     <!-- All Patients -->
     <div id="allPatients" class="tab-content active">
       <div class="card">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+          <button id="btnDeleteSelected" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients()">Delete Selected</button>
+        </div>
         <table>
           <thead>
             <tr>
+              <th style="width: 40px;"><input type="checkbox" id="selectAllPatients" onclick="toggleAllCheckboxes(this)"></th>
               <th>Patient Info</th>
               <th>Assigned Doctor</th>
               <th>Status</th>
@@ -169,7 +176,7 @@
       </div>
     </div>
 
-    <!-- Appointments Tab -->
+    <!-- Appointments -->
     <div id="appointments" class="tab-content">
       <div class="card">
         <h3 style="margin-bottom: 10px; font-family: 'Outfit';">Hospital Statistics</h3>
@@ -236,6 +243,54 @@
     </div>
   </div>
 
+  <!-- Edit Patient Modal -->
+  <div id="editPatientModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Patient</h2>
+        <button class="close-btn" onclick="closeModal('editPatientModal')">×</button>
+      </div>
+      <form id="editPatientForm">
+        <input type="hidden" id="editPatId">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editPatName" required>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="editPatAge" min="1" max="120" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3); if(this.value > 120) this.value = 120;" required>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="editPatGender" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Phone Number (10 digits)</label>
+            <input type="tel" id="editPatPhone" pattern="[6-9][0-9]{9}" title="Must be a valid 10-digit mobile number starting with 6, 7, 8, or 9" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
+          </div>
+          <div class="form-group">
+            <label>Assign to Doctor</label>
+            <select id="editPatDoctor">
+              <option value="">-- Unassigned --</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Chief Complaint</label>
+          <textarea id="editPatComplaint" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Change PIN Modal -->
   <div id="changePinModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 400px;">
@@ -269,6 +324,7 @@
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
     // Fetch and render patients
+    let allPatientsData = [];
     async function loadPatients() {
       if (!hospId) return;
       try {
@@ -276,21 +332,26 @@
         const patients = await res.json();
         const tbody = document.getElementById('patientListBody');
         tbody.innerHTML = '';
+        allPatientsData = patients;
         if (res.ok && Array.isArray(patients)) {
           patients.forEach(p => {
             const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
             const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
             tbody.innerHTML += `
             <tr>
+              <td><input type="checkbox" class="patient-checkbox" value="${p.id}" onclick="updateDeleteBtn()"></td>
               <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span></td>
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
               <td data-label="Actions">
-                <a href="#" style="color:#ef4444; text-decoration:none;" onclick="alert('Delete functionality coming soon')">Delete</a>
+                <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
               </td>
             </tr>`;
           });
         }
+        updateDeleteBtn();
+        const selectAll = document.getElementById('selectAllPatients');
+        if(selectAll) selectAll.checked = false;
       } catch (err) {
         console.error("Failed to load patients:", err);
       }
@@ -305,9 +366,16 @@
         const doctors = await res.json();
         if (res.ok && Array.isArray(doctors)) {
           const select = document.getElementById('patDoctor');
+          const editSelect = document.getElementById('editPatDoctor');
           select.innerHTML = '<option value="">-- Unassigned --</option>'; // clear loading state
+          editSelect.innerHTML = '<option value="">-- Unassigned --</option>';
+          const tbody = document.getElementById('doctorListBody');
+          tbody.innerHTML = '';
           doctors.forEach(doc => {
-            select.innerHTML += `<option value="${doc.id}">${doc.full_name}</option>`;
+            const docName = doc.full_name.startsWith('Dr.') ? doc.full_name : 'Dr. ' + doc.full_name;
+            select.innerHTML += `<option value="${doc.id}">${docName}</option>`;
+            editSelect.innerHTML += `<option value="${doc.id}">${docName}</option>`;
+            tbody.innerHTML += `<tr><td>${doc.login_id}</td><td>${docName}</td><td>+91-${doc.phone}</td><td>${doc.qualification || 'N/A'}</td></tr>`;
           });
         }
       } catch (err) {
@@ -315,6 +383,29 @@
       }
     }
     loadDoctors();
+
+    async function loadStaff() {
+      if (!hospId) return;
+      try {
+        const res = await fetch(`/api/list_staff?hospital_id=${hospId}`);
+        const staff = await res.json();
+        if (res.ok && Array.isArray(staff)) {
+          const tbody = document.getElementById('staffListBody');
+          tbody.innerHTML = '';
+          staff.forEach(s => {
+            tbody.innerHTML += `<tr><td>${s.login_id}</td><td>${s.full_name}</td><td>+91-${s.phone}</td></tr>`;
+          });
+        }
+      } catch(err) {}
+    }
+    loadStaff();
+
+    function refreshCurrentTab() {
+      const activeTab = document.querySelector('.tab-content.active').id;
+      if (activeTab === 'allPatients') loadPatients();
+      else if (activeTab === 'doctorDirectory') loadDoctors();
+      else if (activeTab === 'staffDirectory') loadStaff();
+    }
 
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
@@ -410,6 +501,83 @@
         closeModal('changePinModal');
         e.target.reset();
       } catch (err) {
+        showToast("Error connecting to server", "error");
+      }
+    });
+
+    // Bulk Delete Logic
+    function toggleAllCheckboxes(source) {
+      document.querySelectorAll('.patient-checkbox').forEach(cb => cb.checked = source.checked);
+      updateDeleteBtn();
+    }
+    function updateDeleteBtn() {
+      const anyChecked = Array.from(document.querySelectorAll('.patient-checkbox')).some(cb => cb.checked);
+      document.getElementById('btnDeleteSelected').style.display = anyChecked ? 'block' : 'none';
+    }
+    async function deleteSelectedPatients() {
+      if (!confirm("Are you sure you want to delete the selected patients?")) return;
+      const selected = Array.from(document.querySelectorAll('.patient-checkbox')).filter(cb => cb.checked).map(cb => cb.value);
+      if(selected.length === 0) return;
+      
+      try {
+        const res = await fetch('/api/delete_patients', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ patient_ids: selected })
+        });
+        if(res.ok) {
+          showToast(`Deleted ${selected.length} patients successfully.`, "success");
+          loadPatients();
+        } else {
+          const err = await res.json();
+          showToast(err.error || "Failed to delete patients", "error");
+        }
+      } catch(e) {
+        showToast("Error connecting to server", "error");
+      }
+    }
+
+    // Edit Patient Logic
+    function openEditPatient(id) {
+      const patient = allPatientsData.find(p => p.id === id);
+      if(!patient) return;
+      document.getElementById('editPatId').value = patient.id;
+      document.getElementById('editPatName').value = patient.full_name;
+      document.getElementById('editPatAge').value = patient.age;
+      document.getElementById('editPatGender').value = patient.gender;
+      document.getElementById('editPatPhone').value = patient.phone;
+      document.getElementById('editPatComplaint').value = patient.chief_complaint || '';
+      document.getElementById('editPatDoctor').value = patient.assigned_doctor_id || '';
+      openModal('editPatientModal');
+    }
+
+    document.getElementById('editPatientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        patient_id: document.getElementById('editPatId').value,
+        full_name: document.getElementById('editPatName').value,
+        age: parseInt(document.getElementById('editPatAge').value),
+        gender: document.getElementById('editPatGender').value,
+        phone: document.getElementById('editPatPhone').value,
+        chief_complaint: document.getElementById('editPatComplaint').value,
+        assigned_doctor_id: document.getElementById('editPatDoctor').value || null
+      };
+
+      try {
+        const res = await fetch('/api/edit_patient', {
+          method: 'POST', // using POST instead of PATCH because edge function routes to onRequestPost
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if(res.ok) {
+          showToast("Patient updated successfully!", "success");
+          closeModal('editPatientModal');
+          loadPatients();
+        } else {
+          const err = await res.json();
+          showToast(err.error || "Failed to update", "error");
+        }
+      } catch(e) {
         showToast("Error connecting to server", "error");
       }
     });

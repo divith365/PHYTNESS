@@ -259,6 +259,7 @@
             sessionStorage.setItem('adminPin', pin);
         } else if (data.user) {
             sessionStorage.setItem('userId', data.user.id);
+            sessionStorage.setItem('userName', data.user.full_name);
             if (data.user.hospital_name) sessionStorage.setItem('hospitalName', data.user.hospital_name);
             if (data.user.hospital_id) sessionStorage.setItem('hospitalId', data.user.hospital_id);
         }
