@@ -237,6 +237,25 @@
     </div>
   </div>
 
+  <!-- Beautiful Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+      <h2 style="color: var(--primary); font-family: 'Outfit'; margin-bottom: 5px;" id="successModalTitle">Success!</h2>
+      <p style="color: var(--text); font-size: 1.05rem; margin-bottom: 25px;" id="successModalDesc"></p>
+      <div style="background: var(--bg); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
+        <p style="margin-bottom: 8px; color: #64748B; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Login ID</p>
+        <h3 style="font-family: monospace; font-size: 2rem; color: var(--primary-dark); letter-spacing: 2px; margin: 0;" id="successModalLoginId"></h3>
+        
+        <div style="height: 1px; background: var(--glass-border); margin: 20px 0;"></div>
+        
+        <p style="margin-bottom: 8px; color: #64748B; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Default PIN</p>
+        <h3 style="font-family: monospace; font-size: 2rem; color: var(--primary-dark); letter-spacing: 2px; margin: 0;">123456</h3>
+      </div>
+      <button class="btn-primary" style="width: 100%; padding: 14px;" onclick="closeModal('successModal')">Awesome, got it!</button>
+    </div>
+  </div>
+
   <div class="toast" id="toastMsg"><span id="toastText">Action successful!</span></div>
 
   <script>
@@ -281,11 +300,13 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
 
-            // Populate Hospitals
+            // Map for Hospitals
+            const hospMap = {};
             const hospBody = document.getElementById('hospitalsTableBody');
             hospBody.innerHTML = '';
             if (data.hospitals && data.hospitals.length > 0) {
                 data.hospitals.forEach(h => {
+                    hospMap[h.id] = h.name; // Store for staff mapping
                     hospBody.innerHTML += `<tr>
                         <td data-label="Hospital">${h.name}</td>
                         <td data-label="Prefix">${h.prefix}</td>
@@ -307,10 +328,15 @@
             staffBody.innerHTML = '';
             if (data.staff && data.staff.length > 0) {
                 data.staff.forEach(s => {
+                    const hospName = hospMap[s.hospital_id] || 'Unknown Hospital';
+                    const roleBadge = s.role_type === 'Doctor' 
+                        ? `<span class="tag" style="background:rgba(16, 185, 129, 0.1); color:#10B981; font-size:0.75rem; margin-left:8px;">Doctor</span>`
+                        : `<span class="tag" style="background:rgba(0, 163, 160, 0.1); color:var(--primary); font-size:0.75rem; margin-left:8px;">Staff</span>`;
+                    
                     staffBody.innerHTML += `<tr>
-                        <td data-label="Name">${s.full_name}</td>
-                        <td data-label="ID">${s.login_id}</td>
-                        <td data-label="Hospital ID">${s.hospital_id}</td>
+                        <td data-label="Name">${s.full_name} ${roleBadge}</td>
+                        <td data-label="ID"><strong>${s.login_id}</strong></td>
+                        <td data-label="Assigned Hospital">${hospName}</td>
                         <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
                         <td data-label="Action">-</td>
                     </tr>`;
@@ -421,7 +447,13 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
             const newId = data.staff ? data.staff.login_id : data.doctor.login_id;
-            alert(`${role} created successfully!\nTheir Login ID is: ${newId}\nDefault PIN is: 123456`);
+            
+            // Show Beautiful Modal instead of alert
+            document.getElementById('successModalTitle').innerText = `${role} Created!`;
+            document.getElementById('successModalDesc').innerText = `${document.getElementById('staffName').value} has been securely added to the system.`;
+            document.getElementById('successModalLoginId').innerText = newId;
+            openModal('successModal');
+            
             closeModal('addStaffModal');
             document.getElementById('addStaffForm').reset();
             loadData();

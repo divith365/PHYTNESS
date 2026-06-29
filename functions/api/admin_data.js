@@ -25,7 +25,9 @@ export async function onRequestPost({ request, env }) {
     const docs = await docRes.json();
     const logs = await auditRes.json();
 
-    const allStaff = [...(staff || []), ...(docs || [])];
+    const staffWithRole = (staff || []).map(s => ({ ...s, role_type: 'Staff' }));
+    const docsWithRole = (docs || []).map(d => ({ ...d, role_type: 'Doctor' }));
+    const allStaff = [...staffWithRole, ...docsWithRole];
 
     return new Response(JSON.stringify({ hospitals, staff: allStaff, logs }), { headers: { 'Content-Type': 'application/json' }});
   } catch (err) {
