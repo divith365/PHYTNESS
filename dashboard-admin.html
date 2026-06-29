@@ -504,9 +504,6 @@
 
     document.getElementById('editHospitalForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number to authorize this edit:");
-        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
-        if(!phone || !pin) return;
 
         try {
             const res = await fetch('/api/edit_hospital', {
@@ -517,8 +514,8 @@
                     name: document.getElementById('editHospName').value,
                     prefix: document.getElementById('editHospPrefix').value,
                     contact: document.getElementById('editHospContact').value,
-                    admin_phone: phone,
-                    admin_pin: pin
+                    admin_phone: adminPhone,
+                    admin_pin: adminPin
                 })
             });
             const data = await res.json();
@@ -549,9 +546,6 @@
 
     document.getElementById('editStaffForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number to authorize this edit:");
-        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
-        if(!phone || !pin) return;
 
         try {
             const res = await fetch('/api/edit_staff', {
@@ -563,8 +557,8 @@
                     hospital_id: document.getElementById('editStaffHosp').value,
                     full_name: document.getElementById('editStaffName').value,
                     phone: document.getElementById('editStaffPhone').value,
-                    admin_phone: phone,
-                    admin_pin: pin
+                    admin_phone: adminPhone,
+                    admin_pin: adminPin
                 })
             });
             const data = await res.json();
@@ -586,16 +580,11 @@
     window.deleteHospital = async function(id, name) {
         if(!confirm(`Are you absolutely sure you want to DELETE ${name}?\n\nWARNING: This will permanently erase all staff, doctors, patients, and records for this hospital.`)) return;
         
-        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number:");
-        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
-        
-        if(!phone || !pin) return;
-
         try {
             const res = await fetch('/api/delete_hospital', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ hospital_id: id, admin_phone: phone, admin_pin: pin })
+                body: JSON.stringify({ hospital_id: id, admin_phone: adminPhone, admin_pin: adminPin })
             });
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
@@ -609,16 +598,11 @@
     window.toggleStatus = async function(type, id, makeActive, name) {
         if(!confirm(`Are you sure you want to ${makeActive ? 'ACTIVATE' : 'PAUSE'} ${name}?`)) return;
         
-        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number:");
-        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
-        
-        if(!phone || !pin) return;
-
         try {
             const res = await fetch('/api/toggle_status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target_type: type, target_id: id, is_active: makeActive, admin_phone: phone, admin_pin: pin })
+                body: JSON.stringify({ target_type: type, target_id: id, is_active: makeActive, admin_phone: adminPhone, admin_pin: adminPin })
             });
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
