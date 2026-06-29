@@ -108,7 +108,25 @@
     </div>
 
     <!-- Staff Tab -->
-    <div id="staff" class="tab-content"><div class="card"><table><thead><tr><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead><tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody></table></div></div>
+    <div id="staff" class="tab-content">
+      <div class="card">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+          <input type="text" id="filterStaffName" placeholder="Search by name..." style="flex:1; min-width: 200px; padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" oninput="renderStaffTable()">
+          <select id="filterStaffRole" style="padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" onchange="renderStaffTable()">
+            <option value="">All Roles</option>
+            <option value="Staff">Staff</option>
+            <option value="Doctor">Doctor</option>
+          </select>
+          <select id="filterStaffHosp" style="padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" onchange="renderStaffTable()">
+            <option value="">All Hospitals</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Audit Logs Tab -->
     <div id="audit" class="tab-content">
@@ -260,6 +278,8 @@
 
   <script>
     let currentPendingAction = null; 
+    let globalStaffList = [];
+    let globalHospMap = {};
 
     // Password Toggle
     window.toggleModalPassword = function(inputId, iconEl) {
@@ -300,13 +320,17 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
 
-            // Map for Hospitals
-            const hospMap = {};
+            // Populate Hospitals & Global Maps
+            globalHospMap = {};
             const hospBody = document.getElementById('hospitalsTableBody');
+            const hospFilter = document.getElementById('filterStaffHosp');
             hospBody.innerHTML = '';
+            hospFilter.innerHTML = '<option value="">All Hospitals</option>';
+
             if (data.hospitals && data.hospitals.length > 0) {
                 data.hospitals.forEach(h => {
-                    hospMap[h.id] = h.name; // Store for staff mapping
+                    globalHospMap[h.id] = h.name; // Store for staff mapping
+                    hospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
                     hospBody.innerHTML += `<tr>
                         <td data-label="Hospital">${h.name}</td>
                         <td data-label="Prefix">${h.prefix}</td>
@@ -324,26 +348,8 @@
             }
 
             // Populate Staff
-            const staffBody = document.getElementById('staffTableBody');
-            staffBody.innerHTML = '';
-            if (data.staff && data.staff.length > 0) {
-                data.staff.forEach(s => {
-                    const hospName = hospMap[s.hospital_id] || 'Unknown Hospital';
-                    const roleBadge = s.role_type === 'Doctor' 
-                        ? `<span class="tag" style="background:rgba(16, 185, 129, 0.1); color:#10B981; font-size:0.75rem; margin-left:8px;">Doctor</span>`
-                        : `<span class="tag" style="background:rgba(0, 163, 160, 0.1); color:var(--primary); font-size:0.75rem; margin-left:8px;">Staff</span>`;
-                    
-                    staffBody.innerHTML += `<tr>
-                        <td data-label="Name">${s.full_name} ${roleBadge}</td>
-                        <td data-label="ID"><strong>${s.login_id}</strong></td>
-                        <td data-label="Assigned Hospital">${hospName}</td>
-                        <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
-                        <td data-label="Action">-</td>
-                    </tr>`;
-                });
-            } else {
-                staffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No staff found.</td></tr>';
-            }
+            globalStaffList = data.staff || [];
+            renderStaffTable();
 
             // Populate Audit Logs
             const auditBody = document.getElementById('auditTableBody');
@@ -365,6 +371,45 @@
         }
     }
     window.addEventListener('load', loadData);
+
+    window.renderStaffTable = function() {
+        const staffBody = document.getElementById('staffTableBody');
+        const nameFilter = document.getElementById('filterStaffName').value.toLowerCase();
+        const roleFilter = document.getElementById('filterStaffRole').value;
+        const hospFilter = document.getElementById('filterStaffHosp').value;
+
+        staffBody.innerHTML = '';
+
+        const filtered = globalStaffList.filter(s => {
+            if (nameFilter && !s.full_name.toLowerCase().includes(nameFilter)) return false;
+            if (roleFilter && s.role_type !== roleFilter) return false;
+            if (hospFilter && s.hospital_id !== hospFilter) return false;
+            return true;
+        });
+
+        if (filtered.length > 0) {
+            filtered.forEach(s => {
+                const hospName = globalHospMap[s.hospital_id] || 'Unknown Hospital';
+                const roleBadge = s.role_type === 'Doctor' 
+                    ? `<span class="tag" style="background:rgba(16, 185, 129, 0.1); color:#10B981; font-size:0.75rem; margin-left:8px;">Doctor</span>`
+                    : `<span class="tag" style="background:rgba(0, 163, 160, 0.1); color:var(--primary); font-size:0.75rem; margin-left:8px;">Staff</span>`;
+                
+                const actionBtn = s.is_active 
+                    ? `<a href="#" style="color:#F59E0B; text-decoration:none; font-weight:500;" onclick="toggleStatus('${s.role_type}', '${s.id}', false, '${s.full_name}')">⏸ Pause</a>`
+                    : `<a href="#" style="color:#10B981; text-decoration:none; font-weight:500;" onclick="toggleStatus('${s.role_type}', '${s.id}', true, '${s.full_name}')">▶ Activate</a>`;
+
+                staffBody.innerHTML += `<tr>
+                    <td data-label="Name">${s.full_name} ${roleBadge}</td>
+                    <td data-label="ID"><strong>${s.login_id}</strong></td>
+                    <td data-label="Assigned Hospital">${hospName}</td>
+                    <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
+                    <td data-label="Action">${actionBtn}</td>
+                </tr>`;
+            });
+        } else {
+            staffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No staff found matching filters.</td></tr>';
+        }
+    };
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -421,6 +466,29 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
             showToast('Hospital deleted permanently!');
+            loadData();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    };
+
+    window.toggleStatus = async function(type, id, makeActive, name) {
+        if(!confirm(`Are you sure you want to ${makeActive ? 'ACTIVATE' : 'PAUSE'} ${name}?`)) return;
+        
+        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number:");
+        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
+        
+        if(!phone || !pin) return;
+
+        try {
+            const res = await fetch('/api/toggle_status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_type: type, target_id: id, is_active: makeActive, admin_phone: phone, admin_pin: pin })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast(`${name} is now ${makeActive ? 'Active' : 'Paused'}!`);
             loadData();
         } catch(err) {
             alert("Error: " + err.message);
