@@ -252,10 +252,12 @@
         btn.innerText = '✓ Access Granted';
         btn.style.background = '#10B981'; // Success Green
         
-        // Store session for admin
+        // Store session data
         if (currentRole === 'Admin') {
             sessionStorage.setItem('adminPhone', identifier);
             sessionStorage.setItem('adminPin', pin);
+        } else if (data.user && data.user.hospital_name) {
+            sessionStorage.setItem('hospitalName', data.user.hospital_name);
         }
 
         // Redirect based on role

@@ -51,10 +51,13 @@ export async function onRequestPost({ request, env }) {
 
       // If Staff or Doctor or Patient, check if Hospital is active
       if (role !== 'Admin' && user.hospital_id) {
-        const hospRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals?id=eq.${user.hospital_id}&select=is_active`, { headers });
+        const hospRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals?id=eq.${user.hospital_id}&select=is_active,name`, { headers });
         const hospData = await hospRes.json();
-        if (hospData && hospData.length > 0 && !hospData[0].is_active) {
-          return new Response(JSON.stringify({ error: "This Hospital/Centre is currently paused." }), { status: 403 });
+        if (hospData && hospData.length > 0) {
+          if (!hospData[0].is_active) {
+            return new Response(JSON.stringify({ error: "This Hospital/Centre is currently paused." }), { status: 403 });
+          }
+          user.hospital_name = hospData[0].name;
         }
       }
 
