@@ -203,7 +203,7 @@
         <div class="two-col">
           <div class="form-group">
             <label>Age</label>
-            <input type="number" id="patAge" required>
+            <input type="number" id="patAge" min="1" max="120" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3); if(this.value > 120) this.value = 120;" required>
           </div>
           <div class="form-group">
             <label>Gender</label>
@@ -289,10 +289,36 @@
 
     document.getElementById('addPatientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      showToast("Patient registered successfully!", "success");
-      closeModal('addPatientModal');
-      e.target.reset();
-      // API call to /api/add_patient
+      
+      const payload = {
+        hospital_id: hospId,
+        full_name: document.getElementById('patName').value,
+        age: parseInt(document.getElementById('patAge').value),
+        gender: document.getElementById('patGender').value,
+        phone: document.getElementById('patPhone').value,
+        chief_complaint: document.getElementById('patComplaint').value,
+        assigned_doctor_id: document.getElementById('patDoctor').value || null
+      };
+
+      try {
+        const res = await fetch('/api/add_patient', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (!res.ok) {
+          const err = await res.json();
+          showToast(err.error || "Failed to register patient", "error");
+          return;
+        }
+
+        showToast("Patient registered successfully!", "success");
+        closeModal('addPatientModal');
+        e.target.reset();
+      } catch (err) {
+        showToast("Error connecting to server", "error");
+      }
     });
   </script>
 </body>
