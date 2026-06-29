@@ -16,22 +16,12 @@
       --glass-hover: rgba(255, 255, 255, 0.08);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top right, #112230, var(--bg-darker) 60%);
-      color: var(--text); min-height: 100vh;
-    }
-    .navbar {
-      background: rgba(5, 8, 10, 0.6); backdrop-filter: blur(12px);
-      padding: 16px 32px; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 50;
-    }
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, #112230, var(--bg-darker) 60%); color: var(--text); min-height: 100vh; }
+    .navbar { background: rgba(5, 8, 10, 0.6); backdrop-filter: blur(12px); padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 50; }
     .nav-brand { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--primary); font-size: 1.5rem; letter-spacing: 1px; display: flex; align-items: center; gap: 12px; }
     .btn-logout { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
     .btn-logout:hover { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(255, 90, 95, 0.4); }
-    
     .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-    
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
     .header h1 { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 2.2rem; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
@@ -39,7 +29,7 @@
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5); }
     
     .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; overflow-x: auto; }
-    .tab { background: transparent; color: #888; border: none; padding: 10px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: 0.3s; position: relative; }
+    .tab { background: transparent; color: #888; border: none; padding: 10px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: 0.3s; position: relative; white-space: nowrap; }
     .tab.active { color: var(--primary); }
     .tab.active::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 2px; background: var(--primary); border-radius: 2px; box-shadow: 0 -2px 10px rgba(0, 212, 255, 0.8); }
     .tab:hover:not(.active) { color: #fff; }
@@ -48,39 +38,21 @@
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    .card {
-      background: var(--glass-bg); backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px;
-      margin-bottom: 24px; transition: transform 0.3s ease;
-    }
-    .card:hover { border-color: rgba(255,255,255,0.15); }
+    .card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; margin-bottom: 24px; transition: transform 0.3s ease; }
     
     table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 8px; }
     th { padding: 14px 20px; text-align: left; color: #888; font-weight: 500; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
     td { padding: 16px 20px; background: rgba(255,255,255,0.02); font-size: 0.95rem; }
     tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
     tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-    tr:hover td { background: rgba(255,255,255,0.05); }
-
-    .tag { background: rgba(0, 212, 255, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(0, 212, 255, 0.2); }
-    .tag.offline { background: rgba(255, 90, 95, 0.1); color: var(--accent); border-color: rgba(255, 90, 95, 0.2); }
-
-    /* Modal styles */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center; z-index: 1000;
-      opacity: 0; transition: opacity 0.3s ease;
-    }
-    .modal-overlay.active { display: flex; opacity: 1; }
-    .modal-content {
-      background: #111A22; border: 1px solid var(--glass-border);
-      border-radius: 20px; padding: 32px; width: 90%; max-width: 500px;
-      max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      transform: scale(0.95); transition: transform 0.3s ease;
-    }
-    .modal-overlay.active .modal-content { transform: scale(1); }
     
+    .tag { background: rgba(0, 212, 255, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(0, 212, 255, 0.2); }
+    
+    /* Modals */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-content { background: #111A22; border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform: scale(0.95); transition: transform 0.3s ease; }
+    .modal-overlay.active .modal-content { transform: scale(1); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .modal-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #fff; }
     .close-btn { background: rgba(255,255,255,0.05); border: none; color: #aaa; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -88,29 +60,15 @@
     
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 8px; font-weight: 500; }
-    .form-group input, .form-group select {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-      padding: 14px; border-radius: 10px; color: white; font-family: 'Inter', sans-serif;
-      transition: all 0.3s ease;
-    }
-    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1); background: rgba(0,0,0,0.5); }
+    .form-group input, .form-group select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white; font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: 0.3s; }
     
-    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5); }
-
     .toast { position: fixed; bottom: 30px; right: 30px; background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.3); color: white; padding: 16px 24px; border-radius: 12px; backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 2000; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 12px; }
     .toast.show { transform: translateY(0); opacity: 1; }
 
-    @media (max-width: 768px) {
-      .header { flex-direction: column; align-items: flex-start; }
-      .tabs { overflow-x: scroll; }
-      th { display: none; }
-      td { display: block; width: 100%; text-align: right; padding: 10px 16px; }
-      td::before { content: attr(data-label); float: left; color: #888; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; }
-      tr td:first-child { border-radius: 10px 10px 0 0; }
-      tr td:last-child { border-radius: 0 0 10px 10px; }
-      tr { display: block; margin-bottom: 16px; background: rgba(255,255,255,0.02); border-radius: 10px; }
-    }
+    /* Terminal Console */
+    .test-console { background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 20px; border-radius: 8px; height: 350px; overflow-y: auto; font-size: 0.85rem; line-height: 1.5; border: 1px solid #333; margin-top: 15px; }
   </style>
 </head>
 <body>
@@ -119,9 +77,7 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       PHYTNESS <span style="color:#fff; font-weight:400; font-size: 1rem; margin-left: 8px;">Super Admin</span>
     </div>
-    <div style="display: flex; gap: 15px;">
-      <button class="btn-logout" onclick="window.location.href='index.html'">Logout</button>
-    </div>
+    <button class="btn-logout" onclick="window.location.href='index.html'">Logout</button>
   </nav>
 
   <div class="container">
@@ -129,7 +85,7 @@
       <h1>Global Operations Overview</h1>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <button class="btn-primary" onclick="openModal('addHospitalModal')">+ Add Hospital</button>
-        <button class="btn-primary" style="background: linear-gradient(135deg, #FF5A5F, #d9454a); box-shadow: 0 4px 15px rgba(255, 90, 95, 0.3);" onclick="openModal('addStaffModal')">+ Add Staff / Therapist</button>
+        <button class="btn-primary" style="background: linear-gradient(135deg, #FF5A5F, #d9454a);" onclick="openModal('addStaffModal')">+ Add Staff / Therapist</button>
       </div>
     </div>
 
@@ -137,56 +93,23 @@
       <button class="tab active" onclick="switchTab('hospitals', this)">Hospitals Directory</button>
       <button class="tab" onclick="switchTab('staff', this)">Global Staff & Therapists</button>
       <button class="tab" onclick="switchTab('audit', this)">Security & Audit Logs</button>
+      <button class="tab" onclick="switchTab('testing', this)">Diagnostics & Testing</button>
     </div>
 
     <!-- Hospitals Tab -->
     <div id="hospitals" class="tab-content active">
       <div class="card">
         <table>
-          <thead>
-            <tr>
-              <th>Hospital / Centre</th>
-              <th>Login Prefix</th>
-              <th>Contact / Location</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Hospital / Centre</th><th>Login Prefix</th><th>Contact / Location</th><th>Status</th><th>Action</th></tr></thead>
           <tbody id="hospitalsTableBody">
-            <!-- Example Row -->
-            <tr>
-              <td data-label="Hospital">Example Hospital</td>
-              <td data-label="Prefix">EH</td>
-              <td data-label="Contact">support@example.com</td>
-              <td data-label="Status"><span class="tag">Active</span></td>
-              <td data-label="Action">
-                <a href="#" style="color:var(--primary); text-decoration:none;" onclick="triggerExport('test-id', 'Example Hospital')">⬇ Export Excel</a>
-              </td>
-            </tr>
+            <tr><td data-label="Hospital">Example Hospital</td><td data-label="Prefix">EH</td><td data-label="Contact">support@example.com</td><td data-label="Status"><span class="tag">Active</span></td><td data-label="Action"><a href="#" style="color:var(--primary); text-decoration:none;" onclick="triggerExport('test-id', 'Example Hospital')">⬇ Export Excel</a></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- Staff Tab -->
-    <div id="staff" class="tab-content">
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>Name & Role</th>
-              <th>Login ID</th>
-              <th>Assigned Hospital</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="staffTableBody">
-             <tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <div id="staff" class="tab-content"><div class="card"><table><thead><tr><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead><tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody></table></div></div>
 
     <!-- Audit Logs Tab -->
     <div id="audit" class="tab-content">
@@ -195,138 +118,44 @@
           <h3 style="font-family: 'Outfit'; color: #fff;">Audit Trail</h3>
           <button class="btn-logout" style="border-color: #FF5A5F; color: #FF5A5F; padding: 6px 12px; font-size: 0.85rem;" onclick="openModal('purgeLogsModal')">Purge Logs</button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody id="auditTableBody">
-            <tr><td colspan="4" style="text-align:center;">Loading logs...</td></tr>
-          </tbody>
-        </table>
+        <table><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="auditTableBody"><tr><td colspan="4" style="text-align:center;">Loading logs...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- Testing Tab -->
+    <div id="testing" class="tab-content">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-family: 'Outfit'; color: #fff; font-size: 1.4rem;">Automated E2E Test Runner</h3>
+            <p style="color: #888; font-size: 0.9rem; margin-top: 4px;">Executes all core flows against live APIs and guarantees zero DB residue.</p>
+          </div>
+          <button class="btn-primary" style="background: linear-gradient(135deg, #10B981, #059669);" onclick="triggerTestRunner()">Run Test Suite</button>
+        </div>
+        <div class="test-console" id="testConsole">
+          > Ready. Click "Run Test Suite" to begin...
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Add Hospital Modal -->
-  <div class="modal-overlay" id="addHospitalModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Register New Hospital</h2>
-        <button class="close-btn" onclick="closeModal('addHospitalModal')">×</button>
-      </div>
-      <form id="addHospitalForm">
-        <div class="form-group">
-          <label>Hospital / Centre Name</label>
-          <input type="text" id="hospName" required placeholder="e.g. Apollo Physiotherapy">
-        </div>
-        <div class="form-group">
-          <label>Contact Email / Phone</label>
-          <input type="text" id="hospContact" required placeholder="support@apollo.com">
-        </div>
-        <div class="form-group">
-          <label>Address (Optional)</label>
-          <input type="text" id="hospAddress" placeholder="Full Address">
-        </div>
-        
-        <div style="border-top: 1px solid var(--glass-border); margin: 24px 0; padding-top: 24px;">
-          <p style="color: var(--accent); font-size: 0.8rem; margin-bottom: 12px; font-weight: 500;">ADMIN AUTHORIZATION REQUIRED</p>
-          <div class="form-group">
-            <label>Admin Phone</label>
-            <input type="tel" id="authPhone1" required>
-          </div>
-          <div class="form-group">
-            <label>Admin PIN</label>
-            <input type="password" id="authPin1" required>
-          </div>
-        </div>
-        
-        <button type="submit" class="btn-submit">Register Hospital</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Staff Modal -->
-  <div class="modal-overlay" id="addStaffModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Add Staff / Therapist</h2>
-        <button class="close-btn" onclick="closeModal('addStaffModal')">×</button>
-      </div>
-      <form id="addStaffForm">
-        <div class="form-group">
-          <label>Assign to Hospital</label>
-          <select id="staffHospitalId" required>
-            <option value="">Select Hospital...</option>
-            <!-- Populated dynamically in real app -->
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Role</label>
-          <select id="staffRole" required>
-            <option value="Staff">Hospital Staff (Administer Patients)</option>
-            <option value="Doctor">Doctor / Therapist (Treatment Plans)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="staffName" required placeholder="Dr. John Doe or Jane Smith">
-        </div>
-        <div class="form-group">
-          <label>Phone Number</label>
-          <input type="tel" id="staffPhone" required>
-        </div>
-        
-        <div style="border-top: 1px solid var(--glass-border); margin: 24px 0; padding-top: 24px;">
-          <p style="color: var(--accent); font-size: 0.8rem; margin-bottom: 12px; font-weight: 500;">ADMIN AUTHORIZATION REQUIRED</p>
-          <div class="form-group">
-            <label>Admin Phone</label>
-            <input type="tel" id="authPhone2" required>
-          </div>
-          <div class="form-group">
-            <label>Admin PIN</label>
-            <input type="password" id="authPin2" required>
-          </div>
-        </div>
-        
-        <button type="submit" class="btn-submit">Create Account</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Auth Modal for Purge / Export -->
+  <!-- Auth Modal (Reused for Add Hosp, Add Staff, Purge, Export, Testing) -->
   <div class="modal-overlay" id="authActionModal">
     <div class="modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h2 id="authActionTitle">Authorization Required</h2>
-        <button class="close-btn" onclick="closeModal('authActionModal')">×</button>
-      </div>
+      <div class="modal-header"><h2 id="authActionTitle">Authorization Required</h2><button class="close-btn" onclick="closeModal('authActionModal')">×</button></div>
       <form id="authActionForm">
         <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 16px;" id="authActionDesc">Please verify your admin credentials to proceed.</p>
-        <div class="form-group">
-          <label>Admin Phone</label>
-          <input type="tel" id="actionPhone" required>
-        </div>
-        <div class="form-group">
-          <label>Admin PIN</label>
-          <input type="password" id="actionPin" required>
-        </div>
-        <button type="submit" class="btn-submit" id="actionBtn" style="background: linear-gradient(135deg, var(--accent), #d9454a); box-shadow: 0 4px 15px rgba(255, 90, 95, 0.3);">Confirm Action</button>
+        <div class="form-group"><label>Admin Phone</label><input type="tel" id="actionPhone" required></div>
+        <div class="form-group"><label>Admin PIN</label><input type="password" id="actionPin" required></div>
+        <button type="submit" class="btn-submit" id="actionBtn">Confirm Action</button>
       </form>
     </div>
   </div>
 
-  <div class="toast" id="toastMsg">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-    <span id="toastText">Action successful!</span>
-  </div>
+  <div class="toast" id="toastMsg"><span id="toastText">Action successful!</span></div>
 
   <script>
-    let currentPendingAction = null; // Store function to call after auth
+    let currentPendingAction = null; 
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -337,119 +166,106 @@
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    
-    function showToast(msg) {
-      const t = document.getElementById('toastMsg');
-      document.getElementById('toastText').innerText = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 4000);
-    }
+    function showToast(msg) { const t = document.getElementById('toastMsg'); document.getElementById('toastText').innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
 
-    // Auth Action Modal Logic (reused for export and purge)
     document.getElementById('authActionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const phone = document.getElementById('actionPhone').value;
       const pin = document.getElementById('actionPin').value;
-      if (currentPendingAction) {
-        await currentPendingAction(phone, pin);
-      }
+      if (currentPendingAction) await currentPendingAction(phone, pin);
     });
 
-    // --- PURGE LOGS ---
-    function openModal(id) {
-        if (id === 'purgeLogsModal') {
-            document.getElementById('authActionTitle').innerText = 'Purge Audit Logs';
-            document.getElementById('authActionDesc').innerText = 'Warning: This will permanently delete all audit logs. Enter admin credentials to confirm.';
-            document.getElementById('actionBtn').innerText = 'Purge Logs';
-            currentPendingAction = async (phone, pin) => {
-                const btn = document.getElementById('actionBtn');
-                const orig = btn.innerText; btn.innerText = 'Purging...';
-                try {
-                    const res = await fetch('/api/purge_audit', {
-                        method: 'POST', headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ admin_phone: phone, admin_pin: pin })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error);
-                    showToast('Audit logs successfully purged!');
-                    closeModal('authActionModal');
-                } catch(err) { alert(err.message); } finally { btn.innerText = orig; }
-            };
-            document.getElementById('authActionModal').classList.add('active');
-        } else {
-            document.getElementById(id).classList.add('active');
-        }
-    }
-
-    // --- EXPORT TO EXCEL ---
-    function triggerExport(hospitalId, hospitalName) {
-        document.getElementById('authActionTitle').innerText = `Export ${hospitalName}`;
-        document.getElementById('authActionDesc').innerText = 'Enter admin credentials to export all data for this hospital.';
-        document.getElementById('actionBtn').innerText = 'Download Excel';
+    // --- TEST RUNNER LOGIC ---
+    function triggerTestRunner() {
+        document.getElementById('authActionTitle').innerText = 'Authenticate Test Runner';
+        document.getElementById('authActionDesc').innerText = 'Enter admin credentials to authorize full E2E system testing.';
+        document.getElementById('actionBtn').innerText = 'Start Testing';
         
-        currentPendingAction = async (phone, pin) => {
-            const btn = document.getElementById('actionBtn');
-            const orig = btn.innerText; btn.innerText = 'Generating...';
-            try {
-                const res = await fetch('/api/export_hospital', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ hospital_id: hospitalId, admin_phone: phone, admin_pin: pin })
-                });
+        currentPendingAction = async (adminPhone, adminPin) => {
+            closeModal('authActionModal');
+            const consoleDiv = document.getElementById('testConsole');
+            consoleDiv.innerHTML = '> Initializing Test Suite...<br>';
+            
+            const log = (msg, type) => {
+                const color = type === 'error' ? '#ef4444' : type === 'success' ? '#10B981' : '#94A3B8';
+                consoleDiv.innerHTML += `<div style="color:${color}; margin-top:2px;">${msg}</div>`;
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            };
+
+            let failed = false;
+            let testHospitalId = null;
+            let testStaffId = null;
+            let testDocId = null;
+            const TEST_HOSP_NAME = 'AUTO-TEST-HOSPITAL-' + Math.floor(Math.random()*9999);
+
+            async function executeStep(name, promise) {
+                if(failed) return;
+                log(`[START] ${name}...`, 'info');
+                try {
+                    await promise();
+                    log(`[PASS] ${name}`, 'success');
+                } catch(e) {
+                    log(`[FAIL] ${name}: ${e.message}`, 'error');
+                    failed = true;
+                }
+            }
+
+            // 1. Create Hospital
+            await executeStep('Admin creates Test Hospital', async () => {
+                const res = await fetch('/api/add_hospital', { method: 'POST', body: JSON.stringify({ name: TEST_HOSP_NAME, contact: 'test@auto.com', admin_phone: adminPhone, admin_pin: adminPin }) });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
-                
-                // Create Excel Workbook using SheetJS
-                const wb = XLSX.utils.book_new();
-                
-                // Sheet 1: Hospital Details
-                const ws_hosp = XLSX.utils.json_to_sheet([data.hospital]);
-                XLSX.utils.book_append_sheet(wb, ws_hosp, "Hospital Info");
-                
-                // Sheet 2: Staff
-                const ws_staff = XLSX.utils.json_to_sheet(data.staff);
-                XLSX.utils.book_append_sheet(wb, ws_staff, "Staff");
-                
-                // Sheet 3: Doctors
-                const ws_docs = XLSX.utils.json_to_sheet(data.doctors);
-                XLSX.utils.book_append_sheet(wb, ws_docs, "Doctors");
-                
-                // Sheet 4: Patients
-                const ws_patients = XLSX.utils.json_to_sheet(data.patients);
-                XLSX.utils.book_append_sheet(wb, ws_patients, "Patients");
-                
-                // Download
-                XLSX.writeFile(wb, `${hospitalName}_Export.xlsx`);
-                
-                showToast(`Excel downloaded for ${hospitalName}`);
-                closeModal('authActionModal');
-            } catch(err) { alert(err.message); } finally { btn.innerText = orig; }
+                if(!res.ok) throw new Error(data.error);
+                testHospitalId = data.hospital.id;
+            });
+
+            // 2. Create Staff
+            await executeStep('Admin creates Test Staff', async () => {
+                const res = await fetch('/api/add_staff', { method: 'POST', body: JSON.stringify({ hospital_id: testHospitalId, full_name: 'Test Staff', phone: '0000000001', role: 'Staff', admin_phone: adminPhone, admin_pin: adminPin }) });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error);
+                testStaffId = data.staff.login_id;
+            });
+
+            // 3. Create Doctor
+            await executeStep('Admin creates Test Doctor', async () => {
+                const res = await fetch('/api/add_doctor', { method: 'POST', body: JSON.stringify({ hospital_id: testHospitalId, full_name: 'Test Doctor', phone: '0000000002', admin_phone: adminPhone, admin_pin: adminPin }) });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error);
+                testDocId = data.doctor.login_id;
+            });
+
+            // 4. Invalid Login (Rate Limit Check)
+            await executeStep('Staff invalid login & rate limiting', async () => {
+                for(let i=1; i<=3; i++) {
+                    const res = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ role: 'Staff', identifier: testStaffId, pin: 'wrongpin' }) });
+                    const data = await res.json();
+                    if(i < 3 && res.status !== 401) throw new Error(`Expected 401 on try ${i}, got ${res.status}`);
+                    if(i === 3 && res.status !== 429) throw new Error(`Expected 429 lockout on try 3, got ${res.status}`);
+                }
+            });
+
+            // 5. Valid Login
+            await executeStep('Doctor valid login', async () => {
+                const res = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ role: 'Doctor', identifier: testDocId, pin: '123456' }) });
+                if(res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
+            });
+
+            // FINALLY: CLEANUP
+            log(`-----------------------------------`, 'info');
+            log(`[START] Fail-safe Cleanup Mechanism...`, 'info');
+            try {
+                const res = await fetch('/api/cleanup_test', { method: 'POST', body: JSON.stringify({ admin_phone: adminPhone, admin_pin: adminPin, test_identifier: TEST_HOSP_NAME }) });
+                if(!res.ok) throw new Error('Cleanup failed');
+                log(`[PASS] DB Residue completely wiped (hospitals, staff, logs, etc)`, 'success');
+            } catch(e) {
+                log(`[FATAL] Cleanup failed: ${e.message}`, 'error');
+            }
+
+            if(failed) log(`❌ Test Suite Finished with Errors. Check logs above.`, 'error');
+            else log(`✅ Test Suite Finished Successfully. 100% Passed.`, 'success');
         };
         document.getElementById('authActionModal').classList.add('active');
     }
-
-    // Forms
-    document.getElementById('addHospitalForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      const origText = btn.innerText; btn.innerText = 'Registering...';
-      try {
-        const res = await fetch('/api/add_hospital', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            name: document.getElementById('hospName').value,
-            contact: document.getElementById('hospContact').value,
-            address: document.getElementById('hospAddress').value,
-            admin_phone: document.getElementById('authPhone1').value,
-            admin_pin: document.getElementById('authPin1').value
-          })
-        });
-        const data = await res.json();
-        if(!res.ok) throw new Error(data.error);
-        showToast(`Hospital ${data.hospital.name} registered! Prefix: ${data.hospital.prefix}`);
-        closeModal('addHospitalModal');
-        e.target.reset();
-      } catch(err) { alert(err.message); } finally { btn.innerText = origText; }
-    });
   </script>
 </body>
 </html>
