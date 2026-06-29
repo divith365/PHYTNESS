@@ -102,7 +102,7 @@
         <table>
           <thead><tr><th>Hospital / Centre</th><th>Login Prefix</th><th>Contact / Location</th><th>Status</th><th>Action</th></tr></thead>
           <tbody id="hospitalsTableBody">
-            <tr><td data-label="Hospital">Example Hospital</td><td data-label="Prefix">EH</td><td data-label="Contact">support@example.com</td><td data-label="Status"><span class="tag">Active</span></td><td data-label="Action"><a href="#" style="color:var(--primary); text-decoration:none;" onclick="triggerExport('test-id', 'Example Hospital')">⬇ Export Excel</a></td></tr>
+            <tr><td colspan="5" style="text-align:center;">Loading hospitals...</td></tr>
           </tbody>
         </table>
       </div>
@@ -270,6 +270,71 @@
     });
     resetInactivityTimer();
 
+    async function loadData() {
+        const phone = sessionStorage.getItem('adminPhone');
+        const pin = sessionStorage.getItem('adminPin');
+        if(!phone || !pin) return;
+
+        try {
+            const res = await fetch('/api/admin_data', { method: 'POST', body: JSON.stringify({admin_phone: phone, admin_pin: pin})});
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+
+            // Populate Hospitals
+            const hospBody = document.getElementById('hospitalsTableBody');
+            hospBody.innerHTML = '';
+            if (data.hospitals && data.hospitals.length > 0) {
+                data.hospitals.forEach(h => {
+                    hospBody.innerHTML += `<tr>
+                        <td data-label="Hospital">${h.name}</td>
+                        <td data-label="Prefix">${h.prefix}</td>
+                        <td data-label="Contact">${h.contact || 'N/A'}</td>
+                        <td data-label="Status"><span class="tag" style="${h.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${h.is_active ? 'Active' : 'Paused'}</span></td>
+                        <td data-label="Action"><a href="#" style="color:var(--primary); text-decoration:none;" onclick="triggerExport('${h.id}', '${h.name}')">⬇ Export Excel</a></td>
+                    </tr>`;
+                });
+            } else {
+                hospBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hospitals found.</td></tr>';
+            }
+
+            // Populate Staff
+            const staffBody = document.getElementById('staffTableBody');
+            staffBody.innerHTML = '';
+            if (data.staff && data.staff.length > 0) {
+                data.staff.forEach(s => {
+                    staffBody.innerHTML += `<tr>
+                        <td data-label="Name">${s.full_name}</td>
+                        <td data-label="ID">${s.login_id}</td>
+                        <td data-label="Hospital ID">${s.hospital_id}</td>
+                        <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
+                        <td data-label="Action">-</td>
+                    </tr>`;
+                });
+            } else {
+                staffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No staff found.</td></tr>';
+            }
+
+            // Populate Audit Logs
+            const auditBody = document.getElementById('auditTableBody');
+            auditBody.innerHTML = '';
+            if (data.logs && data.logs.length > 0) {
+                data.logs.forEach(l => {
+                    auditBody.innerHTML += `<tr>
+                        <td data-label="Time">${new Date(l.created_at).toLocaleString()}</td>
+                        <td data-label="User">${l.user_type}</td>
+                        <td data-label="Action">${l.action}</td>
+                        <td data-label="Details">${l.details}</td>
+                    </tr>`;
+                });
+            } else {
+                auditBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No logs found.</td></tr>';
+            }
+        } catch(e) {
+            console.error("Failed to load data:", e);
+        }
+    }
+    window.addEventListener('load', loadData);
+
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -295,6 +360,7 @@
             showToast('Hospital created successfully!');
             closeModal('addHospitalModal');
             document.getElementById('addHospitalForm').reset();
+            loadData();
         } catch(err) {
             alert("Error: " + err.message);
         }
@@ -323,6 +389,7 @@
             alert(`${role} created successfully!\nTheir Login ID is: ${newId}\nDefault PIN is: 123456`);
             closeModal('addStaffModal');
             document.getElementById('addStaffForm').reset();
+            loadData();
         } catch(err) {
             alert("Error: " + err.message);
         }

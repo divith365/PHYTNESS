@@ -252,6 +252,12 @@
         btn.innerText = '✓ Access Granted';
         btn.style.background = '#10B981'; // Success Green
         
+        // Store session for admin
+        if (currentRole === 'Admin') {
+            sessionStorage.setItem('adminPhone', identifier);
+            sessionStorage.setItem('adminPin', pin);
+        }
+
         // Redirect based on role
         setTimeout(() => {
           if (currentRole === 'Admin') window.location.href = 'dashboard-admin.html';
