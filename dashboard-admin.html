@@ -139,7 +139,79 @@
     </div>
   </div>
 
-  <!-- Auth Modal (Reused for Add Hosp, Add Staff, Purge, Export, Testing) -->
+  <!-- Add Hospital Modal -->
+  <div id="addHospitalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Hospital</h2>
+        <button class="close-btn" onclick="closeModal('addHospitalModal')">×</button>
+      </div>
+      <form id="addHospitalForm">
+        <div class="form-group">
+          <label>Hospital Name</label>
+          <input type="text" id="hospName" required>
+        </div>
+        <div class="form-group">
+          <label>Contact Email/Phone</label>
+          <input type="text" id="hospContact" required>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Super Admin Authentication</p>
+        <div class="form-group">
+          <label>Admin Phone</label>
+          <input type="tel" id="hospAdminPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Admin PIN</label>
+          <input type="password" id="hospAdminPin" required>
+        </div>
+        <button type="submit" class="btn-submit">Create Hospital</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Staff Modal -->
+  <div id="addStaffModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Staff / Therapist</h2>
+        <button class="close-btn" onclick="closeModal('addStaffModal')">×</button>
+      </div>
+      <form id="addStaffForm">
+        <div class="form-group">
+          <label>Hospital ID</label>
+          <input type="text" id="staffHospId" placeholder="Enter Hospital UUID" required>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="staffRole" required>
+            <option value="Staff">Staff / Front Desk</option>
+            <option value="Doctor">Therapist / Doctor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="staffName" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="staffPhone" required>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+        <div class="form-group">
+          <label>Admin Phone</label>
+          <input type="tel" id="staffAdminPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Admin PIN</label>
+          <input type="password" id="staffAdminPin" required>
+        </div>
+        <button type="submit" class="btn-submit">Create User</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Reused for Purge, Export, Testing) -->
   <div class="modal-overlay" id="authActionModal">
     <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header"><h2 id="authActionTitle">Authorization Required</h2><button class="close-btn" onclick="closeModal('authActionModal')">×</button></div>
@@ -158,11 +230,62 @@
     let currentPendingAction = null; 
 
     function switchTab(tabId, btn) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
     }
+
+    document.getElementById('addHospitalForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch('/api/add_hospital', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: document.getElementById('hospName').value,
+                    contact: document.getElementById('hospContact').value,
+                    admin_phone: document.getElementById('hospAdminPhone').value,
+                    admin_pin: document.getElementById('hospAdminPin').value
+                })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast('Hospital created successfully!');
+            closeModal('addHospitalModal');
+            document.getElementById('addHospitalForm').reset();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    });
+
+    document.getElementById('addStaffForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const role = document.getElementById('staffRole').value;
+            const endpoint = role === 'Staff' ? '/api/add_staff' : '/api/add_doctor';
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    hospital_id: document.getElementById('staffHospId').value,
+                    role: role,
+                    full_name: document.getElementById('staffName').value,
+                    phone: document.getElementById('staffPhone').value,
+                    admin_phone: document.getElementById('staffAdminPhone').value,
+                    admin_pin: document.getElementById('staffAdminPin').value
+                })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            const newId = data.staff ? data.staff.login_id : data.doctor.login_id;
+            alert(`${role} created successfully!\nTheir Login ID is: ${newId}\nDefault PIN is: 123456`);
+            closeModal('addStaffModal');
+            document.getElementById('addStaffForm').reset();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    });
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
