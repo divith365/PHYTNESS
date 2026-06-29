@@ -478,7 +478,7 @@
 
             // 1. Create Hospital
             await executeStep('Admin creates Test Hospital', async () => {
-                const res = await fetch('/api/add_hospital', { method: 'POST', body: JSON.stringify({ name: TEST_HOSP_NAME, contact: 'test@auto.com', admin_phone: adminPhone, admin_pin: adminPin }) });
+                const res = await fetch('/api/add_hospital', { method: 'POST', body: JSON.stringify({ name: TEST_HOSP_NAME, prefix: 'TST', contact: 'test@auto.com', admin_phone: adminPhone, admin_pin: adminPin }) });
                 const data = await res.json();
                 if(!res.ok) throw new Error(data.error);
                 testHospitalId = data.hospital.id;
