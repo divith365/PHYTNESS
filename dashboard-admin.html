@@ -338,7 +338,18 @@
         <p style="margin-bottom: 8px; color: #64748B; font-weight: 500; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Default PIN</p>
         <h3 style="font-family: monospace; font-size: 2rem; color: var(--primary-dark); letter-spacing: 2px; margin: 0;">123456</h3>
       </div>
+      </div>
       <button class="btn-primary" style="width: 100%; padding: 14px;" onclick="closeModal('successModal')">Awesome, got it!</button>
+    </div>
+  </div>
+
+  <!-- Generic Success/Info Modal -->
+  <div class="modal-overlay" id="successMessageModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;" id="successMsgIcon">✅</div>
+      <h2 style="font-family: 'Outfit'; margin-bottom: 10px; color: var(--text);" id="successMsgTitle">Success!</h2>
+      <p style="color: #64748B; font-size: 1.05rem; margin-bottom: 25px; line-height: 1.5;" id="successMsgDesc"></p>
+      <button class="btn-primary" style="width: 100%; padding: 14px; background: var(--text); border-color: var(--text);" onclick="closeModal('successMessageModal')">Got it</button>
     </div>
   </div>
 
@@ -359,6 +370,14 @@
         openModal('confirmModal');
     };
     
+    window.showSuccessMessage = function(title, desc, icon="✅", color="var(--primary)") {
+        document.getElementById('successMsgIcon').innerText = icon;
+        document.getElementById('successMsgTitle').innerText = title;
+        document.getElementById('successMsgTitle').style.color = color;
+        document.getElementById('successMsgDesc').innerText = desc;
+        openModal('successMessageModal');
+    };
+
     document.getElementById('confirmModalYesBtn')?.addEventListener('click', () => {
         closeModal('confirmModal');
         if (confirmCallback) confirmCallback();
@@ -526,7 +545,7 @@
             });
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
-            showToast(`Deleted ${data.deleted} users!`);
+            showSuccessMessage('Users Deleted', `Successfully deleted ${data.deleted} users from the system.`, '🗑️', '#FF5A5F');
             loadData();
         } catch(err) {
             alert("Error: " + err.message);
@@ -591,7 +610,7 @@
             });
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
-            showToast('Hospital updated successfully!');
+            showSuccessMessage('Hospital Updated', 'The hospital details have been saved successfully.', '✏️');
             closeModal('editHospitalModal');
             loadData();
         } catch(err) {
@@ -634,7 +653,7 @@
             });
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
-            showToast('Profile updated successfully!');
+            showSuccessMessage('Profile Updated', 'The staff profile was updated successfully.', '✏️');
             closeModal('editStaffModal');
             loadData();
         } catch(err) {
@@ -661,7 +680,7 @@
                     });
                     const data = await res.json();
                     if(!res.ok) throw new Error(data.error);
-                    showToast('Hospital deleted permanently!');
+                    showSuccessMessage('Hospital Deleted', `${name} and all associated records have been permanently destroyed.`, '🗑️', '#FF5A5F');
                     loadData();
                 } catch(err) {
                     alert("Error: " + err.message);
@@ -683,7 +702,7 @@
                     });
                     const data = await res.json();
                     if(!res.ok) throw new Error(data.error);
-                    showToast('All logs have been purged!');
+                    showSuccessMessage('Logs Purged', 'All system audit logs have been successfully wiped.', '🧹');
                     loadData();
                 } catch(err) {
                     alert("Error: " + err.message);
@@ -705,7 +724,7 @@
                     });
                     const data = await res.json();
                     if(!res.ok) throw new Error(data.error);
-                    showToast(`${name} is now ${makeActive ? 'Active' : 'Paused'}!`);
+                    showSuccessMessage(makeActive ? 'Activated' : 'Paused', `${name} is now ${makeActive ? 'Active' : 'Paused'}.`, makeActive ? '▶' : '⏸', makeActive ? '#10B981' : '#F59E0B');
                     loadData();
                 } catch(err) {
                     alert("Error: " + err.message);
