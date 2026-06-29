@@ -131,8 +131,8 @@
           <button class="btn-primary" style="background: #FF5A5F; border-color: #FF5A5F;" onclick="deleteSelectedStaff()">🗑️ Delete Selected</button>
         </div>
         <table>
-          <thead><tr><th style="width: 40px;"></th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody id="staffTableBody"><tr><td colspan="6" style="text-align:center;">Loading staff...</td></tr></tbody>
+          <thead><tr><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -472,7 +472,12 @@
                     : `<a href="#" style="color:#10B981; text-decoration:none; font-weight:500;" onclick="toggleStatus('${s.role_type}', '${s.id}', true, '${s.full_name}')">▶ Activate</a>`;
 
                 staffBody.innerHTML += `<tr>
-                    <td data-label="Name">${s.full_name} ${roleBadge}</td>
+                    <td data-label="Name">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" class="staff-checkbox" data-id="${s.id}" data-role="${s.role_type}" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>${s.full_name} ${roleBadge}</span>
+                        </div>
+                    </td>
                     <td data-label="ID"><strong>${s.login_id}</strong></td>
                     <td data-label="Assigned Hospital">${hospName}</td>
                     <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
@@ -484,7 +489,7 @@
                 </tr>`;
             });
         } else {
-            staffBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No staff found matching filters.</td></tr>';
+            staffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No staff found matching filters.</td></tr>';
         }
     };
 
