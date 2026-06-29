@@ -381,6 +381,11 @@
                 data.hospitals.forEach(h => {
                     globalHospMap[h.id] = h.name; 
                     hospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
+                    
+                    const hospActionBtn = h.is_active 
+                        ? `<a href="#" style="color:#F59E0B; text-decoration:none; font-weight:500; margin-right:12px;" onclick="toggleStatus('Hospital', '${h.id}', false, '${h.name.replace(/'/g, "\\'")}')">⏸ Pause</a>`
+                        : `<a href="#" style="color:#10B981; text-decoration:none; font-weight:500; margin-right:12px;" onclick="toggleStatus('Hospital', '${h.id}', true, '${h.name.replace(/'/g, "\\'")}')">▶ Activate</a>`;
+
                     hospBody.innerHTML += `<tr>
                         <td data-label="Hospital">${h.name}</td>
                         <td data-label="Prefix">${h.prefix}</td>
@@ -389,6 +394,7 @@
                         <td data-label="Action">
                             <a href="#" style="background:var(--primary); color:white; padding: 5px 10px; border-radius: 4px; text-decoration:none; margin-right: 12px; font-size: 0.8rem; font-weight:500;" onclick="openAddStaffModal('${h.id}', '${h.name.replace(/'/g, "\\'")}')">+ Add Staff</a>
                             <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="openEditHospitalModal('${h.id}', '${h.name.replace(/'/g, "\\'")}', '${h.prefix}', '${h.contact || ''}')">✏️ Edit</a>
+                            ${hospActionBtn}
                             <a href="#" style="color:#FF5A5F; text-decoration:none;" onclick="deleteHospital('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🗑️ Delete</a>
                         </td>
                     </tr>`;
