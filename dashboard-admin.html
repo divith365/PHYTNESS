@@ -203,7 +203,7 @@
         <h3 id="staffHospNameDisplay" style="color:var(--primary); font-family:'Outfit'; margin-bottom:15px; font-size:1.1rem; text-align:center;"></h3>
         <div class="form-group">
           <label>Role</label>
-          <select id="staffRole" required>
+          <select id="staffRole" required onchange="const n = document.getElementById('staffName'); if(this.value === 'Doctor' && !n.value.startsWith('Dr. ')) n.value = 'Dr. ' + n.value; else if(this.value === 'Staff' && n.value.startsWith('Dr. ')) n.value = n.value.replace(/^Dr\.\s*/, '');">
             <option value="Staff">Staff / Front Desk</option>
             <option value="Doctor">Therapist / Doctor</option>
           </select>
