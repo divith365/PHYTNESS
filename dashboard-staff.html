@@ -438,6 +438,7 @@
       if (activeTab === 'allPatients') loadPatients();
       else if (activeTab === 'doctorDirectory') loadDoctors();
       else if (activeTab === 'staffDirectory') loadStaff();
+      showToast('Refreshed!', 'success');
     }
 
     function showToast(message, type = 'success') {

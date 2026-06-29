@@ -132,6 +132,11 @@
       .patient-grid { grid-template-columns: 1fr; }
       .two-col { grid-template-columns: 1fr; }
     }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 12px 16px; background: rgba(0,0,0,0.02); color: #64748b; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 16px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+    tr:hover td { background: rgba(0,0,0,0.01); }
   </style>
 </head>
 <body>
@@ -152,23 +157,86 @@
       <button class="btn-primary" onclick="openModal('addPatientModal')">+ Add Patient</button>
     </div>
 
-    <div class="tabs">
+    <div class="tabs" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <button class="tab active" onclick="switchTab('myPatients', this)">My Patients</button>
       <button class="tab" onclick="switchTab('allPatients', this)">All Centre Patients</button>
+      <button class="tab" onclick="switchTab('staffDirectory', this)">Staff Directory</button>
+      <button class="tab" onclick="switchTab('doctorDirectory', this)">Doctors Directory</button>
       <button class="tab" onclick="switchTab('treatmentView', this)" style="display:none;" id="tabTreatment">Treatment Sheet</button>
+      <button class="icon-btn" onclick="refreshCurrentTab()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; margin-left: auto;" title="Refresh">↻</button>
     </div>
 
     <!-- My Patients -->
     <div id="myPatients" class="tab-content active">
-      <div class="patient-grid" id="myPatientList">
-        <!-- Data will be populated by API -->
+      <div class="card">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+          <button id="btnDeleteSelectedMy" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.my-patient-checkbox')">Delete Selected</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.my-patient-checkbox')"></th>
+              <th>Patient Info</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="myPatientList"></tbody>
+        </table>
       </div>
     </div>
 
     <!-- All Patients -->
     <div id="allPatients" class="tab-content">
-      <div class="patient-grid" id="allPatientList">
-        <!-- Data will be populated by API -->
+      <div class="card">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+          <button id="btnDeleteSelectedAll" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.all-patient-checkbox')">Delete Selected</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.all-patient-checkbox')"></th>
+              <th>Patient Info</th>
+              <th>Assigned Doctor</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allPatientList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Staff Directory -->
+    <div id="staffDirectory" class="tab-content">
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Staff ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+            </tr>
+          </thead>
+          <tbody id="staffListBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Doctor Directory -->
+    <div id="doctorDirectory" class="tab-content">
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Doctor ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Qualification</th>
+            </tr>
+          </thead>
+          <tbody id="doctorListBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -311,6 +379,7 @@
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
     // Fetch and render patients
+    let allPatientsData = [];
     async function loadPatients() {
       const hospId = sessionStorage.getItem('hospitalId');
       const userId = sessionStorage.getItem('userId');
@@ -323,6 +392,7 @@
         const allPatientList = document.getElementById('allPatientList');
         myPatientList.innerHTML = '';
         allPatientList.innerHTML = '';
+        allPatientsData = patients;
         
         if (res.ok && Array.isArray(patients)) {
           patients.forEach(p => {
@@ -330,24 +400,86 @@
             const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
             const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
             
-            const cardHtml = `
-              <div class="patient-card" ${isMine ? `onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')"` : ''}>
-                <div class="patient-name">${p.full_name}</div>
-                <div class="patient-meta">ID: ${p.pt_id || 'N/A'} • ${p.age || '?'} Yrs • ${p.gender || '?'}</div>
-                <div class="patient-meta" style="margin-bottom: 8px;">Chief Complaint: ${p.chief_complaint || 'None'}</div>
-                ${isMine ? statusTag : `<div style="font-size: 0.85rem; color: #666; margin-top: 5px; font-weight: 500;">Assigned to: ${docName}</div>`}
-              </div>
-            `;
+            // All Patients Row
+            allPatientList.innerHTML += `
+            <tr>
+              <td><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
+              <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+              <td data-label="Assigned Doctor">${docName}</td>
+              <td data-label="Status">${statusTag}</td>
+              <td data-label="Actions">
+                <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
+              </td>
+            </tr>`;
             
-            if (isMine) myPatientList.innerHTML += cardHtml;
-            allPatientList.innerHTML += cardHtml;
+            if (isMine) {
+                myPatientList.innerHTML += `
+                <tr>
+                  <td><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
+                  <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+                  <td data-label="Status">${statusTag}</td>
+                  <td data-label="Actions">
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">View Rx</a>
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
+                  </td>
+                </tr>`;
+            }
           });
         }
+        updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll');
+        updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy');
       } catch (err) {
         console.error("Failed to load patients:", err);
       }
     }
     loadPatients();
+    
+    // Directory Loading
+    async function loadDoctors() {
+      const hospId = sessionStorage.getItem('hospitalId');
+      if (!hospId) return;
+      try {
+        const res = await fetch(`/api/list_doctors?hospital_id=${hospId}`);
+        const doctors = await res.json();
+        if (res.ok && Array.isArray(doctors)) {
+          const select = document.getElementById('editPatDoctor');
+          if(select) select.innerHTML = '<option value="">-- Unassigned --</option>';
+          const tbody = document.getElementById('doctorListBody');
+          if(tbody) tbody.innerHTML = '';
+          doctors.forEach(doc => {
+            const docName = doc.full_name.startsWith('Dr.') ? doc.full_name : 'Dr. ' + doc.full_name;
+            if(select) select.innerHTML += `<option value="${doc.id}">${docName}</option>`;
+            if(tbody) tbody.innerHTML += `<tr><td>${doc.login_id}</td><td>${docName}</td><td>+91-${doc.phone}</td><td>${doc.qualification || 'N/A'}</td></tr>`;
+          });
+        }
+      } catch (err) {}
+    }
+    loadDoctors();
+
+    async function loadStaff() {
+      const hospId = sessionStorage.getItem('hospitalId');
+      if (!hospId) return;
+      try {
+        const res = await fetch(`/api/list_staff?hospital_id=${hospId}`);
+        const staff = await res.json();
+        if (res.ok && Array.isArray(staff)) {
+          const tbody = document.getElementById('staffListBody');
+          if(tbody) tbody.innerHTML = '';
+          staff.forEach(s => {
+            if(tbody) tbody.innerHTML += `<tr><td>${s.login_id}</td><td>${s.full_name}</td><td>+91-${s.phone}</td></tr>`;
+          });
+        }
+      } catch(err) {}
+    }
+    loadStaff();
+    
+    function refreshCurrentTab() {
+      const activeTab = document.querySelector('.tab-content.active').id;
+      if (activeTab === 'allPatients' || activeTab === 'myPatients') loadPatients();
+      else if (activeTab === 'doctorDirectory') loadDoctors();
+      else if (activeTab === 'staffDirectory') loadStaff();
+      showToast('Refreshed!', 'success');
+    }
 
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
@@ -388,12 +520,15 @@
     async function saveTreatment() {
       const note = document.getElementById('newTreatmentNote').value;
       if (!note.trim()) { showToast('Note is empty!', 'error'); return; }
-      
+
+      const drName = sessionStorage.getItem('userName');
+      const docPrefix = drName && drName.startsWith('Dr.') ? drName : (drName ? 'Dr. ' + drName : 'Dr.');
+
       // Mocking UI update
       const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const entryHtml = `
         <div class="report-entry">
-          <span class="report-date">${dateStr} (IST) - Treatment Updated</span>
+          <span class="report-date" style="color:#0f172a;"><strong style="font-size: 1.1em; color:var(--primary);">⚕️ Rx</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
           <div class="report-notes">${note}</div>
         </div>`;
       document.getElementById('existingNotes').insertAdjacentHTML('beforeend', entryHtml);
