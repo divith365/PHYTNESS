@@ -189,12 +189,27 @@
 
       selectionView.style.display = 'none';
       loginView.style.display = 'block';
+      history.pushState({ view: 'login' }, '', '#login');
     };
 
     window.showSelection = function() {
-      loginView.style.display = 'none';
-      selectionView.style.display = 'block';
+      if (location.hash === '#login') {
+        history.back();
+      } else {
+        loginView.style.display = 'none';
+        selectionView.style.display = 'block';
+      }
     };
+
+    window.addEventListener('popstate', (event) => {
+      if (location.hash !== '#login') {
+        loginView.style.display = 'none';
+        selectionView.style.display = 'block';
+      } else {
+        selectionView.style.display = 'none';
+        loginView.style.display = 'block';
+      }
+    });
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
