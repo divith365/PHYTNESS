@@ -349,6 +349,8 @@
     let globalStaffList = [];
     let globalHospMap = {};
     let confirmCallback = null;
+    const adminPhone = sessionStorage.getItem('adminPhone');
+    const adminPin = sessionStorage.getItem('adminPin');
 
     window.showConfirm = function(title, desc, callback) {
         document.getElementById('confirmModalTitle').innerText = title;
