@@ -236,6 +236,45 @@
     const hName = sessionStorage.getItem('hospitalName');
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
+    // Fetch and render patients
+    async function loadPatients() {
+      const hospId = sessionStorage.getItem('hospitalId');
+      const userId = sessionStorage.getItem('userId');
+      if (!hospId || !userId) return;
+      try {
+        const res = await fetch(`/api/list_patients?hospital_id=${hospId}`);
+        const patients = await res.json();
+        
+        const myPatientList = document.getElementById('myPatientList');
+        const allPatientList = document.getElementById('allPatientList');
+        myPatientList.innerHTML = '';
+        allPatientList.innerHTML = '';
+        
+        if (res.ok && Array.isArray(patients)) {
+          patients.forEach(p => {
+            const isMine = p.assigned_doctor_id === userId;
+            const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
+            const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
+            
+            const cardHtml = `
+              <div class="patient-card" ${isMine ? `onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')"` : ''}>
+                <div class="patient-name">${p.full_name}</div>
+                <div class="patient-meta">ID: ${p.pt_id || 'N/A'} • ${p.age || '?'} Yrs • ${p.gender || '?'}</div>
+                <div class="patient-meta" style="margin-bottom: 8px;">Chief Complaint: ${p.chief_complaint || 'None'}</div>
+                ${isMine ? statusTag : `<div style="font-size: 0.85rem; color: #666; margin-top: 5px; font-weight: 500;">Assigned to: ${docName}</div>`}
+              </div>
+            `;
+            
+            if (isMine) myPatientList.innerHTML += cardHtml;
+            allPatientList.innerHTML += cardHtml;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load patients:", err);
+      }
+    }
+    loadPatients();
+
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -328,6 +367,7 @@
         showToast("Patient registered and assigned to you!", "success");
         closeModal('addPatientModal');
         e.target.reset();
+        loadPatients(); // Refresh the DOM with the new patient
       } catch (err) {
         showToast("Error connecting to server", "error");
       }

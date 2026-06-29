@@ -242,6 +242,35 @@
     const hospId = sessionStorage.getItem('hospitalId');
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
+    // Fetch and render patients
+    async function loadPatients() {
+      if (!hospId) return;
+      try {
+        const res = await fetch(`/api/list_patients?hospital_id=${hospId}`);
+        const patients = await res.json();
+        const tbody = document.getElementById('patientListBody');
+        tbody.innerHTML = '';
+        if (res.ok && Array.isArray(patients)) {
+          patients.forEach(p => {
+            const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
+            const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
+            tbody.innerHTML += `
+            <tr>
+              <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span></td>
+              <td data-label="Assigned Doctor">${docName}</td>
+              <td data-label="Status">${statusTag}</td>
+              <td data-label="Actions">
+                <a href="#" style="color:#ef4444; text-decoration:none;" onclick="alert('Delete functionality coming soon')">Delete</a>
+              </td>
+            </tr>`;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load patients:", err);
+      }
+    }
+    loadPatients();
+
     // Fetch and populate doctors for this center
     async function loadDoctors() {
       if (!hospId) return;
@@ -316,6 +345,7 @@
         showToast("Patient registered successfully!", "success");
         closeModal('addPatientModal');
         e.target.reset();
+        loadPatients(); // Refresh the table
       } catch (err) {
         showToast("Error connecting to server", "error");
       }
