@@ -17,8 +17,10 @@ export async function onRequestPost({ request, env }) {
     };
 
     let targetTable = '';
+    let targetIdField = 'phone';
     if (target_role === 'Admin') targetTable = 'admins';
-    else if (target_role === 'Doctor') targetTable = 'doctors';
+    else if (target_role === 'Doctor') { targetTable = 'doctors'; targetIdField = 'login_id'; }
+    else if (target_role === 'Staff') { targetTable = 'staff'; targetIdField = 'login_id'; }
     else if (target_role === 'Patient') targetTable = 'patients';
     else return new Response(JSON.stringify({ error: "Invalid target role" }), { status: 400 });
 
@@ -44,13 +46,13 @@ export async function onRequestPost({ request, env }) {
     } else {
       // Verify Old PIN
       if (!old_pin) return new Response(JSON.stringify({ error: "Old PIN is required for self change" }), { status: 401 });
-      const userRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?phone=eq.${encodeURIComponent(target_phone)}&pin=eq.${encodeURIComponent(old_pin)}&select=id`, { headers });
+      const userRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?${targetIdField}=eq.${encodeURIComponent(target_phone)}&pin=eq.${encodeURIComponent(old_pin)}&select=id`, { headers });
       const userData = await userRes.json();
-      if (!userData || userData.length === 0) return new Response(JSON.stringify({ error: "Incorrect Old PIN or Phone Number" }), { status: 401 });
+      if (!userData || userData.length === 0) return new Response(JSON.stringify({ error: "Incorrect Old PIN" }), { status: 401 });
     }
 
     // Perform the Update
-    const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?phone=eq.${encodeURIComponent(target_phone)}`, {
+    const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?${targetIdField}=eq.${encodeURIComponent(target_phone)}`, {
       method: 'PATCH',
       headers: { ...headers, 'Prefer': 'return=representation' },
       body: JSON.stringify({ pin: new_pin })

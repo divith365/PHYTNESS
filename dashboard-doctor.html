@@ -141,6 +141,7 @@
       <span style="color:#1E293B; font-weight:400; font-size: 1rem; margin-left: 8px;">Doctor Portal <span id="hospNameHeader" style="font-weight:600; color:var(--primary-dark);"></span></span>
     </div>
     <div style="display: flex; gap: 15px;">
+      <button class="btn-logout" style="background:#f8fafc; color:#1E293B; border:1px solid #cbd5e1; box-shadow: none;" onclick="openModal('changePinModal')">Change PIN</button>
       <button class="btn-logout" onclick="window.location.href='index.html'">Logout</button>
     </div>
   </nav>
@@ -226,6 +227,31 @@
           <textarea id="patComplaint" rows="2"></textarea>
         </div>
         <button type="submit" class="btn-primary" style="width:100%; margin-top:20px;">Register Patient</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change PIN Modal -->
+  <div id="changePinModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Change Your PIN</h2>
+        <button class="close-btn" onclick="closeModal('changePinModal')">×</button>
+      </div>
+      <form id="changePinForm">
+        <div class="form-group">
+          <label>Current PIN</label>
+          <input type="password" id="cpOldPin" maxlength="4" required>
+        </div>
+        <div class="form-group">
+          <label>New PIN (4 digits)</label>
+          <input type="password" id="cpNewPin" pattern="[0-9]{4}" title="Must be exactly 4 digits" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm New PIN</label>
+          <input type="password" id="cpConfirmPin" pattern="[0-9]{4}" title="Must be exactly 4 digits" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)" required>
+        </div>
+        <button type="submit" class="btn-submit">Update PIN</button>
       </form>
     </div>
   </div>
@@ -368,6 +394,43 @@
         closeModal('addPatientModal');
         e.target.reset();
         loadPatients(); // Refresh the DOM with the new patient
+      } catch (err) {
+        showToast("Error connecting to server", "error");
+      }
+    });
+
+    document.getElementById('changePinForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPin = document.getElementById('cpNewPin').value;
+      if (newPin !== document.getElementById('cpConfirmPin').value) {
+        showToast("New PINs do not match", "error");
+        return;
+      }
+
+      const payload = {
+        target_role: 'Doctor',
+        target_phone: sessionStorage.getItem('loginId'),
+        old_pin: document.getElementById('cpOldPin').value,
+        new_pin: newPin,
+        is_admin_override: false
+      };
+
+      try {
+        const res = await fetch('/api/change_pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (!res.ok) {
+          const err = await res.json();
+          showToast(err.error || "Failed to change PIN", "error");
+          return;
+        }
+
+        showToast("PIN changed successfully!", "success");
+        closeModal('changePinModal');
+        e.target.reset();
       } catch (err) {
         showToast("Error connecting to server", "error");
       }

@@ -253,6 +253,7 @@
         btn.style.background = '#10B981'; // Success Green
         
         // Store session data
+        sessionStorage.setItem('loginId', identifier);
         if (currentRole === 'Admin') {
             sessionStorage.setItem('adminPhone', identifier);
             sessionStorage.setItem('adminPin', pin);
