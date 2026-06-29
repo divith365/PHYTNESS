@@ -152,7 +152,10 @@
           </div>
           <div class="input-group">
             <label>PIN Code</label>
-            <input type="password" id="pinInput" placeholder="Enter your PIN" required>
+            <div style="position: relative;">
+              <input type="password" id="pinInput" placeholder="Enter your PIN" required style="padding-right: 40px;">
+              <span id="togglePin" onclick="togglePassword()" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.1rem; filter: grayscale(1); opacity: 0.5; user-select: none;">👁️</span>
+            </div>
           </div>
           <button type="submit" class="submit-btn" id="submitBtn">Login</button>
         </form>
@@ -210,6 +213,18 @@
         loginView.style.display = 'block';
       }
     });
+
+    window.togglePassword = function() {
+      const pinInput = document.getElementById('pinInput');
+      const toggleIcon = document.getElementById('togglePin');
+      if (pinInput.type === 'password') {
+        pinInput.type = 'text';
+        toggleIcon.style.opacity = '1';
+      } else {
+        pinInput.type = 'password';
+        toggleIcon.style.opacity = '0.5';
+      }
+    };
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();

@@ -29,13 +29,19 @@ export async function onRequestPost({ request, env }) {
     // 2. Validate User
     let tableName = '';
     let idField = '';
-    if (role === 'Admin') { tableName = 'admins'; idField = 'phone'; }
+    let activeFilter = '&is_active=eq.true'; // Default for staff/doctors/patients
+    
+    if (role === 'Admin') { 
+        tableName = 'admins'; 
+        idField = 'phone'; 
+        activeFilter = ''; // Admins do not have an is_active column
+    }
     else if (role === 'Staff') { tableName = 'staff'; idField = 'login_id'; }
     else if (role === 'Doctor') { tableName = 'doctors'; idField = 'login_id'; }
     else if (role === 'Patient') { tableName = 'patients'; idField = 'phone'; }
     else return new Response(JSON.stringify({ error: "Invalid role" }), { status: 400 });
 
-    const userRes = await fetch(`${SUPABASE_URL}/rest/v1/${tableName}?${idField}=eq.${encodeURIComponent(identifier)}&pin=eq.${encodeURIComponent(pin)}&is_active=eq.true&select=*`, {
+    const userRes = await fetch(`${SUPABASE_URL}/rest/v1/${tableName}?${idField}=eq.${encodeURIComponent(identifier)}&pin=eq.${encodeURIComponent(pin)}${activeFilter}&select=*`, {
       headers
     });
     const userData = await userRes.json();
