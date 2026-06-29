@@ -81,7 +81,7 @@
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px; font-weight: 500; }
     .form-group input, .form-group select, .form-group textarea {
-      width: 100%; background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border);
+      width: 100%; background: #f8fafc; border: 1px solid #cbd5e1;
       padding: 12px; border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif;
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
@@ -237,9 +237,29 @@
 
   <div id="toastContainer"></div>
   <script>
-    // Load Hospital Name
+    // Load Hospital Name & ID
     const hName = sessionStorage.getItem('hospitalName');
+    const hospId = sessionStorage.getItem('hospitalId');
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
+
+    // Fetch and populate doctors for this center
+    async function loadDoctors() {
+      if (!hospId) return;
+      try {
+        const res = await fetch(`/api/list_doctors?hospital_id=${hospId}`);
+        const doctors = await res.json();
+        if (res.ok && Array.isArray(doctors)) {
+          const select = document.getElementById('patDoctor');
+          select.innerHTML = '<option value="">-- Unassigned --</option>'; // clear loading state
+          doctors.forEach(doc => {
+            select.innerHTML += `<option value="${doc.id}">${doc.full_name}</option>`;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load doctors:", err);
+      }
+    }
+    loadDoctors();
 
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');

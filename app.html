@@ -256,8 +256,9 @@
         if (currentRole === 'Admin') {
             sessionStorage.setItem('adminPhone', identifier);
             sessionStorage.setItem('adminPin', pin);
-        } else if (data.user && data.user.hospital_name) {
-            sessionStorage.setItem('hospitalName', data.user.hospital_name);
+        } else if (data.user) {
+            if (data.user.hospital_name) sessionStorage.setItem('hospitalName', data.user.hospital_name);
+            if (data.user.hospital_id) sessionStorage.setItem('hospitalId', data.user.hospital_id);
         }
 
         // Redirect based on role

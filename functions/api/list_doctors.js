@@ -1,5 +1,8 @@
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
   try {
+    const url = new URL(request.url);
+    const hospId = url.searchParams.get('hospital_id');
+
     const SUPABASE_URL = env.SUPABASE_URL || 'https://iwxdrhuzybkccxryekey.supabase.co';
     const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3eGRyaHV6eWJrY2N4cnlla2V5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjgyODgsImV4cCI6MjA5ODE0NDI4OH0.RrPVtsvbBVtdFsEmwPxBsqDx4laM91W7A9PUgOBlFTo';
 
@@ -9,7 +12,10 @@ export async function onRequestGet({ env }) {
       'Content-Type': 'application/json'
     };
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?select=id,full_name,specialization,phone`, { headers });
+    let fetchUrl = `${SUPABASE_URL}/rest/v1/doctors?select=id,full_name,specialization,phone`;
+    if (hospId) fetchUrl += `&hospital_id=eq.${encodeURIComponent(hospId)}`;
+
+    const res = await fetch(fetchUrl, { headers });
     const data = await res.json();
 
     if (!res.ok) {
