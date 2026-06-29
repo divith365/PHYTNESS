@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Dashboard - Phytness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #F59E0B; --primary-dark: #D97706; --accent: #2DD4BF;
+      --bg-dark: #1E293B; --bg-darker: #0F172A; --text: #F1F5F9;
+      --glass-bg: rgba(15, 23, 42, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top left, #334155, var(--bg-darker) 80%);
+      color: var(--text); min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(12px);
+      padding: 16px 32px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 50;
+    }
+    .nav-brand { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--primary); font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+    .btn-logout { background: transparent; color: var(--text); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+    .btn-logout:hover { background: rgba(255,255,255,0.1); }
+    
+    .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+    .header h1 { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 2.2rem; }
+    
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; overflow-x: auto; }
+    .tab { background: transparent; color: #94A3B8; border: none; padding: 10px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: 0.3s; position: relative; }
+    .tab.active { color: var(--primary); }
+    .tab.active::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 2px; background: var(--primary); border-radius: 2px; box-shadow: 0 -2px 10px rgba(245, 158, 11, 0.8); }
+    .tab:hover:not(.active) { color: #fff; }
+
+    .tab-content { display: none; animation: fadeIn 0.4s ease forwards; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 8px; }
+    th { padding: 14px 20px; text-align: left; color: #94A3B8; font-weight: 500; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+    td { padding: 16px 20px; background: rgba(255,255,255,0.02); font-size: 0.95rem; }
+    tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+    tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+    tr:hover td { background: rgba(255,255,255,0.05); }
+
+    .tag { display: inline-block; background: rgba(45, 212, 191, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(45, 212, 191, 0.2); }
+    
+    /* Modals */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: #0F172A; border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 32px; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #fff; }
+    .close-btn { background: rgba(255,255,255,0.05); border: none; color: #aaa; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+    .close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #94A3B8; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+      padding: 12px; border-radius: 8px; color: white; font-family: 'Inter', sans-serif;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+    
+    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+    
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    @media (max-width: 768px) {
+      .two-col { grid-template-columns: 1fr; }
+      th { display: none; }
+      td { display: block; width: 100%; text-align: right; padding: 10px 16px; }
+      td::before { content: attr(data-label); float: left; color: #888; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; }
+      tr td:first-child { border-radius: 10px 10px 0 0; }
+      tr td:last-child { border-radius: 0 0 10px 10px; }
+      tr { display: block; margin-bottom: 16px; background: rgba(255,255,255,0.02); border-radius: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      PHYTNESS <span style="color:#F1F5F9; font-weight:400; font-size: 1rem; margin-left: 8px;">Staff Portal</span>
+    </div>
+    <div style="display: flex; gap: 15px;">
+      <button class="btn-logout" onclick="window.location.href='index.html'">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Welcome, <span id="staffNameDisplay" style="color: var(--primary);">Staff Member</span></h1>
+      <button class="btn-primary" onclick="openModal('addPatientModal')">+ Register Patient</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('allPatients', this)">Patient Directory</button>
+      <button class="tab" onclick="switchTab('appointments', this)">Appointments / Stats</button>
+    </div>
+
+    <!-- All Patients -->
+    <div id="allPatients" class="tab-content active">
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient Info</th>
+              <th>Assigned Doctor</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patientListBody">
+            <!-- Mock Data -->
+            <tr>
+              <td data-label="Patient Info"><strong>Rahul Sharma</strong><br><span style="font-size:0.8rem; color:#94A3B8;">CH-P001 • +91-9876543210</span></td>
+              <td data-label="Assigned Doctor">Dr. Ananya</td>
+              <td data-label="Status"><span class="tag">Ongoing</span></td>
+              <td data-label="Actions">
+                <a href="#" style="color:var(--accent); margin-right:10px; text-decoration:none;">Assign Dr</a>
+                <a href="#" style="color:#ef4444; text-decoration:none;">Delete</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Appointments Tab -->
+    <div id="appointments" class="tab-content">
+      <div class="card">
+        <h3 style="margin-bottom: 10px; font-family: 'Outfit';">Hospital Statistics</h3>
+        <p style="color: #94A3B8;">Staff can view overall patient load across all doctors here.</p>
+        <div style="margin-top: 20px; display: flex; gap: 20px;">
+           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; flex:1; text-align: center;">
+              <h2 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 5px;">24</h2>
+              <p>Active Patients</p>
+           </div>
+           <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; flex:1; text-align: center;">
+              <h2 style="color: var(--accent); font-size: 2.5rem; margin-bottom: 5px;">4</h2>
+              <p>Therapists</p>
+           </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Add Patient Modal -->
+  <div class="modal-overlay" id="addPatientModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Register New Patient</h2>
+        <button class="close-btn" onclick="closeModal('addPatientModal')">×</button>
+      </div>
+      <form id="addPatientForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="patName" required>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="patAge" required>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="patGender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="patPhone" required>
+          </div>
+          <div class="form-group">
+            <label>Assign to Doctor</label>
+            <select id="patDoctor">
+              <option value="">-- Unassigned --</option>
+              <!-- Will be populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Chief Complaint</label>
+          <textarea id="patComplaint" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Register Patient</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.getElementById('addPatientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alert("Patient registered successfully!");
+      closeModal('addPatientModal');
+      e.target.reset();
+      // API call to /api/add_patient
+    });
+  </script>
+</body>
+</html>

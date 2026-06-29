@@ -4,271 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Phytness Portal</title>
-  
-  <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1A2E35">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0F172A">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --teal: #00A3A0;
-      --teal-dark: #007A78;
-      --orange: #F47B20;
-      --dark: #ffffff;
-      --darker: #f5f7fa;
-      --text: #1A2E35;
-      --glass-bg: rgba(0, 0, 0, 0.04);
-      --glass-border: rgba(0, 0, 0, 0.1);
+      --primary: #2DD4BF; --primary-dark: #14B8A6;
+      --accent: #F59E0B; --admin: #FF5A5F;
+      --bg-dark: #0F172A; --bg-darker: #020617;
+      --text: #F8FAFC;
+      --glass-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #e0eceb 100%);
+      background: radial-gradient(circle at top right, #1E293B, var(--bg-darker) 70%);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 1vh;
-      overflow-x: hidden;
-      position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow-x: hidden; position: relative;
     }
 
-    /* Animated background elements */
-    .bg-shape {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      z-index: 0;
-      animation: float 10s infinite ease-in-out alternate;
-    }
-    .shape1 { width: 300px; height: 300px; background: rgba(0, 163, 160, 0.2); top: -100px; left: -100px; }
-    .shape2 { width: 250px; height: 250px; background: rgba(244, 123, 32, 0.15); bottom: -50px; right: -50px; animation-delay: -5s; }
+    .bg-shape { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; animation: float 10s infinite ease-in-out alternate; }
+    .shape1 { width: 300px; height: 300px; background: rgba(45, 212, 191, 0.15); top: -100px; left: -100px; }
+    .shape2 { width: 250px; height: 250px; background: rgba(245, 158, 11, 0.1); bottom: -50px; right: -50px; animation-delay: -5s; }
 
-    @keyframes float {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(30px, 50px); }
-    }
+    @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
 
-    .container {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 440px;
-      padding: 30px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    .container { position: relative; z-index: 10; width: 100%; max-width: 440px; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; }
 
-    /* Logo */
-    .logo-container {
-      margin-bottom: -15px; /* Negative margin to eat up transparent space in image */
-      text-align: center;
-      animation: fadeInDown 0.8s ease forwards;
-    }
-    .logo-container img {
-      height: 240px; /* Perfectly sized for mobile, increased by 50% */
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
-    }
+    .logo-container { text-align: center; animation: fadeInDown 0.8s ease forwards; margin-bottom: 20px; }
+    .logo-container svg { width: 64px; height: 64px; color: var(--primary); filter: drop-shadow(0 4px 10px rgba(45, 212, 191, 0.4)); margin-bottom: 10px; }
 
-    /* Portal Title */
-    h1 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-align: center;
-      letter-spacing: 0.5px;
-    }
-    p.subtitle {
-      font-size: 0.9rem;
-      color: rgba(0, 0, 0, 0.6);
-      margin-bottom: 40px;
-      text-align: center;
-    }
+    h1 { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 8px; text-align: center; background: linear-gradient(90deg, #fff, #94A3B8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p.subtitle { font-size: 0.95rem; color: #94A3B8; margin-bottom: 40px; text-align: center; }
 
-    /* View states */
-    #selectionView, #loginView {
-      width: 100%;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    
-    #loginView {
-      display: none;
-    }
+    #selectionView, #loginView { width: 100%; transition: opacity 0.4s ease, transform 0.4s ease; }
+    #loginView { display: none; }
 
-    /* Role Cards */
-    .roles-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
-    }
+    .roles-grid { display: flex; flex-direction: column; gap: 16px; width: 100%; }
 
     .role-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      animation: fadeInUp 0.6s ease forwards;
-      opacity: 0;
-      transform: translateY(20px);
+      background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px;
+      display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: fadeInUp 0.6s ease forwards; opacity: 0; transform: translateY(20px);
     }
     .role-card:nth-child(1) { animation-delay: 0.1s; }
     .role-card:nth-child(2) { animation-delay: 0.2s; }
     .role-card:nth-child(3) { animation-delay: 0.3s; }
 
-    .role-card:hover, .role-card:active {
-      background: rgba(0, 0, 0, 0.08);
-      border-color: var(--teal);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(0, 163, 160, 0.15);
-    }
+    .role-card:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(45, 212, 191, 0.15); }
 
-    .role-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0, 163, 160, 0.3);
-    }
+    .role-icon { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3); }
     
-    .role-card.admin .role-icon {
-      background: linear-gradient(135deg, var(--orange) 0%, #d66512 100%);
-      box-shadow: 0 4px 12px rgba(244, 123, 32, 0.3);
-    }
-
-    .role-text h3 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .role-text p {
-      font-size: 0.8rem;
-      color: rgba(0, 0, 0, 0.6);
-    }
+    .role-text h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 2px; }
+    .role-text p { font-size: 0.8rem; color: #94A3B8; }
     
-    .role-arrow {
-      margin-left: auto;
-      color: var(--teal);
-      font-size: 1.2rem;
-      transition: transform 0.3s ease;
-    }
-    .role-card:hover .role-arrow {
-      transform: translateX(4px);
-    }
+    .role-arrow { margin-left: auto; color: var(--primary); font-size: 1.2rem; transition: transform 0.3s ease; }
+    .role-card:hover .role-arrow { transform: translateX(4px); }
 
-    /* Login Form (Glassmorphism) */
-    .login-box {
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 32px 24px;
-      width: 100%;
-    }
+    .login-box { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px 24px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
     
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: rgba(0,0,0,0.6);
-      font-size: 0.85rem;
-      text-decoration: none;
-      margin-bottom: 24px;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    .back-btn:hover { color: black; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #94A3B8; font-size: 0.85rem; text-decoration: none; margin-bottom: 24px; cursor: pointer; transition: color 0.2s; }
+    .back-btn:hover { color: #fff; }
 
-    .login-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-    .login-header h2 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+    .login-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--glass-border); }
+    .login-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 600; }
 
-    .input-group {
-      margin-bottom: 16px;
-    }
-    .input-group label {
-      display: block;
-      font-size: 0.8rem;
-      color: rgba(0,0,0,0.7);
-      margin-bottom: 8px;
-    }
-    .input-group input {
-      width: 100%;
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(0,0,0,0.15);
-      padding: 14px 16px;
-      border-radius: 10px;
-      color: #1A2E35;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .input-group input:focus {
-      border-color: var(--teal);
-      background: #ffffff;
-    }
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; font-size: 0.85rem; color: #94A3B8; margin-bottom: 8px; }
+    .input-group input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 14px 16px; border-radius: 10px; color: #fff; font-family: 'Inter', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+    .input-group input:focus { border-color: var(--primary); }
 
-    .submit-btn {
-      width: 100%;
-      background: var(--teal);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 1rem;
-      margin-top: 12px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .submit-btn:hover { background: var(--teal-dark); }
+    .submit-btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--bg-darker); border: none; padding: 14px; border-radius: 10px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1rem; margin-top: 12px; cursor: pointer; transition: transform 0.1s, box-shadow 0.3s; box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3); }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45, 212, 191, 0.5); }
     .submit-btn:active { transform: scale(0.98); }
 
-    /* Animations */
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -278,47 +95,45 @@
 
   <div class="container">
     
-    <!-- Shared Logo -->
     <div class="logo-container">
-      <img src="logo_transparent.png" alt="Phytness Healthcare">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <h1>PHYTNESS</h1>
+      <p class="subtitle">Select your portal to continue</p>
     </div>
 
     <!-- VIEW 1: Role Selection -->
     <div id="selectionView">
-      <h1 style="margin-top: 0px; margin-bottom: 0px;">Welcome to Phytness</h1>
-      <p class="subtitle">Please select your portal to continue</p>
-
       <div class="roles-grid">
-        <div class="role-card" onclick="showLogin('Doctor', '🩺', 'Therapist')">
+        <div class="role-card" onclick="showLogin('Doctor', '🩺', 'Therapist Login', 'Login ID (e.g., CH-D01)')">
           <div class="role-icon">🩺</div>
           <div class="role-text">
-            <h3>Therapist Login</h3>
+            <h3>Therapist Portal</h3>
             <p>Access patient records & plans</p>
           </div>
           <div class="role-arrow">→</div>
         </div>
 
-        <div class="role-card" onclick="showLogin('Doctor', '📋', 'Staff')">
-          <div class="role-icon">📋</div>
+        <div class="role-card" onclick="showLogin('Staff', '📋', 'Staff Login', 'Login ID (e.g., CH-S01)')">
+          <div class="role-icon" style="background: linear-gradient(135deg, var(--accent) 0%, #d97706 100%); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">📋</div>
           <div class="role-text">
-            <h3>Staff Login</h3>
-            <p>Manage appointments & records</p>
+            <h3>Staff Portal</h3>
+            <p>Manage appointments & directory</p>
           </div>
           <div class="role-arrow">→</div>
         </div>
 
-        <div class="role-card" onclick="showLogin('Patient', '👤')">
-          <div class="role-icon">👤</div>
+        <div class="role-card" onclick="showLogin('Patient', '👤', 'Patient Login', 'Registered Phone Number')">
+          <div class="role-icon" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">👤</div>
           <div class="role-text">
-            <h3>Patient Login</h3>
+            <h3>Patient Portal</h3>
             <p>View your rehab progress</p>
           </div>
           <div class="role-arrow">→</div>
         </div>
       </div>
       
-      <div style="margin-top: 24px; text-align: center;">
-        <span onclick="showLogin('Admin', '⚙️')" style="color: rgba(0,0,0,0.4); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; cursor: pointer;" onmouseover="this.style.color='black'" onmouseout="this.style.color='rgba(0,0,0,0.4)'">Admin Login</span>
+      <div style="margin-top: 30px; text-align: center;">
+        <span onclick="showLogin('Admin', '⚙️', 'Super Admin Login', 'Admin Phone Number')" style="color: #64748B; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748B'">Admin Access</span>
       </div>
     </div>
 
@@ -328,20 +143,20 @@
         <a class="back-btn" onclick="showSelection()">← Back to roles</a>
         
         <div class="login-header">
-          <div class="role-icon" id="loginIcon" style="background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); width: 60px; height: 60px; font-size: 1.8rem; border-radius: 16px;">🩺</div>
+          <div class="role-icon" id="loginIcon" style="width: 50px; height: 50px; font-size: 1.5rem; border-radius: 12px;">🩺</div>
           <h2 id="loginTitle">Staff Login</h2>
         </div>
 
         <form id="loginForm">
           <div class="input-group">
-            <label>Phone Number</label>
-            <input type="tel" id="phoneInput" placeholder="Enter your 10-digit phone number" required pattern="[0-9]{10}" maxlength="10" title="Please enter a 10-digit phone number">
+            <label id="identifierLabel">Login Identifier</label>
+            <input type="text" id="identifierInput" placeholder="Enter ID or Phone" required>
           </div>
           <div class="input-group">
-            <label>PIN</label>
-            <input type="password" id="pinInput" placeholder="Enter your 4-digit PIN" required>
+            <label>PIN Code</label>
+            <input type="password" id="pinInput" placeholder="Enter your PIN" required>
           </div>
-          <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
+          <button type="submit" class="submit-btn" id="submitBtn">Authenticate</button>
         </form>
       </div>
     </div>
@@ -349,36 +164,31 @@
   </div>
 
   <script>
-    // Unregister Service Worker to prevent PWA caching issues during development
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let registration of registrations) {
-          registration.unregister();
-        }
-      });
-    }
-
-    // UI Logic
     let currentRole = '';
     const selectionView = document.getElementById('selectionView');
     const loginView = document.getElementById('loginView');
     const loginTitle = document.getElementById('loginTitle');
     const loginIcon = document.getElementById('loginIcon');
+    const identifierLabel = document.getElementById('identifierLabel');
+    const identifierInput = document.getElementById('identifierInput');
 
-    window.showLogin = function(role, icon, displayLabel) {
+    window.showLogin = function(role, icon, displayLabel, placeholderText) {
       currentRole = role;
-      // Update form header
-      loginTitle.innerText = `${displayLabel || role} Login`;
+      loginTitle.innerText = displayLabel;
       loginIcon.innerText = icon;
+      identifierLabel.innerText = placeholderText;
+      identifierInput.placeholder = placeholderText;
       
-      // Update color theme based on role
       if(role === 'Admin') {
-        loginIcon.style.background = 'linear-gradient(135deg, var(--orange) 0%, #d66512 100%)';
+        loginIcon.style.background = 'linear-gradient(135deg, var(--admin) 0%, #d9454a 100%)';
+      } else if(role === 'Staff') {
+        loginIcon.style.background = 'linear-gradient(135deg, var(--accent) 0%, #d97706 100%)';
+      } else if (role === 'Patient') {
+        loginIcon.style.background = 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)';
       } else {
-        loginIcon.style.background = 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)';
+        loginIcon.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)';
       }
 
-      // Instant Transition to fix mobile browser bugs
       selectionView.style.display = 'none';
       loginView.style.display = 'block';
     };
@@ -391,52 +201,42 @@
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const phone = document.getElementById('phoneInput').value;
+      const identifier = document.getElementById('identifierInput').value;
       const pin = document.getElementById('pinInput').value;
       const btn = document.getElementById('submitBtn');
       const originalText = btn.innerText;
       
       btn.innerText = 'Authenticating...';
-      btn.style.opacity = '0.8';
       
       try {
         const response = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: currentRole, phone, pin })
+          body: JSON.stringify({ role: currentRole, identifier, pin }) // Note: Sending 'identifier' now
         });
         
-        let data = {};
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-          data = await response.json();
-        } else {
-          const text = await response.text();
-          throw new Error(`Server returned ${response.status}: ${text.substring(0, 50)}...`);
-        }
+        const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.error_description || data.msg || 'Login failed');
+          throw new Error(data.error || 'Login failed');
         }
         
-        btn.innerText = '✓ Success!';
-        btn.style.background = '#27ae60';
-        btn.style.opacity = '1';
+        btn.innerText = '✓ Access Granted';
+        btn.style.background = '#10B981'; // Success Green
         
         // Redirect based on role
         setTimeout(() => {
-          if (currentRole === 'Admin') window.location.href = 'dashboard-admin';
-          else if (currentRole === 'Doctor') window.location.href = 'dashboard-doctor';
-          else window.location.href = 'dashboard-patient';
+          if (currentRole === 'Admin') window.location.href = 'dashboard-admin.html';
+          else if (currentRole === 'Doctor') window.location.href = 'dashboard-doctor.html';
+          else if (currentRole === 'Staff') window.location.href = 'dashboard-staff.html';
+          else window.location.href = 'dashboard-patient.html';
         }, 800);
         
       } catch (err) {
         alert("Login failed: " + err.message);
         btn.innerText = originalText;
-        btn.style.opacity = '1';
       }
     });
   </script>
 </body>
 </html>
-

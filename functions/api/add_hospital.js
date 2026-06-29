@@ -3,9 +3,9 @@ import { getSupabaseConfig, logAudit } from './shared.js';
 export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
-    const { hospital_id, full_name, phone, email, qualification, specialization, experience, admin_phone, admin_pin } = data;
+    const { name, address, contact, admin_phone, admin_pin } = data;
 
-    if (!hospital_id || !full_name || !phone || !admin_phone || !admin_pin) {
+    if (!name || !contact || !admin_phone || !admin_pin) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
     }
 
@@ -18,38 +18,32 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: "Unauthorized Admin" }), { status: 401 });
     }
 
-    // 2. Insert Doctor
-    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/doctors`, {
+    // 2. Insert Hospital
+    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals`, {
       method: 'POST',
       headers: { ...headers, 'Prefer': 'return=representation' },
-      body: JSON.stringify({ 
-        hospital_id, full_name, phone, 
-        email: email || null, 
-        qualification: qualification || null, 
-        specialization: specialization || null, 
-        experience: experience || 0
-      })
+      body: JSON.stringify({ name, address, contact })
     });
     
     if (!insertRes.ok) {
         const err = await insertRes.json();
-        return new Response(JSON.stringify({ error: err.message || "Failed to insert doctor" }), { status: insertRes.status });
+        return new Response(JSON.stringify({ error: err.message }), { status: insertRes.status });
     }
     const inserted = await insertRes.json();
-    const newDoc = inserted[0];
+    const newHospital = inserted[0];
 
     // 3. Log Audit
     await logAudit(env, {
-        hospital_id: hospital_id,
+        hospital_id: newHospital.id,
         user_type: 'Admin',
         user_id: authData[0].id,
-        action: 'ADD_DOCTOR',
-        target_type: 'Doctor',
-        target_id: newDoc.id,
-        details: `Created new doctor: ${full_name} (${newDoc.login_id})`
+        action: 'ADD_HOSPITAL',
+        target_type: 'Hospital',
+        target_id: newHospital.id,
+        details: `Created new hospital: ${name}`
     });
 
-    return new Response(JSON.stringify({ success: true, doctor: newDoc }), {
+    return new Response(JSON.stringify({ success: true, hospital: newHospital }), {
       status: 200, headers: { 'Content-Type': 'application/json' }
     });
 
