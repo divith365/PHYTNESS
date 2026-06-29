@@ -186,5 +186,22 @@ CREATE TABLE login_attempts (
     last_attempt_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- ==========================================
+-- 8. AUTO-ROTATION FOR AUDIT LOGS
+-- ==========================================
+-- Automatically deletes logs older than 90 days to prevent infinite database growth
+CREATE OR REPLACE FUNCTION rotate_audit_logs() 
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM audit_logs WHERE created_at < NOW() - INTERVAL '90 days';
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_rotate_audit_logs
+AFTER INSERT ON audit_logs
+FOR EACH STATEMENT
+EXECUTE FUNCTION rotate_audit_logs();
+
 -- Insert a default admin so you can login!
 INSERT INTO admins (full_name, phone, pin) VALUES ('Super Admin', '1234567890', '123456') ON CONFLICT (phone) DO NOTHING;
