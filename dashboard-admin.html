@@ -85,7 +85,6 @@
       <h1>Global Operations Overview</h1>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <button class="btn-primary" onclick="openModal('addHospitalModal')">+ Add Hospital</button>
-        <button class="btn-primary" style="background: linear-gradient(135deg, #FF5A5F, #d9454a);" onclick="openModal('addStaffModal')">+ Add Staff / Therapist</button>
       </div>
     </div>
 
@@ -152,6 +151,10 @@
           <input type="text" id="hospName" required>
         </div>
         <div class="form-group">
+          <label>Login Prefix (e.g., PH)</label>
+          <input type="text" id="hospPrefix" required maxlength="4" style="text-transform: uppercase;">
+        </div>
+        <div class="form-group">
           <label>Contact Email/Phone</label>
           <input type="text" id="hospContact" required>
         </div>
@@ -181,10 +184,8 @@
         <button class="close-btn" onclick="closeModal('addStaffModal')">×</button>
       </div>
       <form id="addStaffForm">
-        <div class="form-group">
-          <label>Hospital ID</label>
-          <input type="text" id="staffHospId" placeholder="Enter Hospital UUID" required>
-        </div>
+        <input type="hidden" id="staffHospId">
+        <h3 id="staffHospNameDisplay" style="color:var(--primary); font-family:'Outfit'; margin-bottom:15px; font-size:1.1rem; text-align:center;"></h3>
         <div class="form-group">
           <label>Role</label>
           <select id="staffRole" required>
@@ -290,7 +291,11 @@
                         <td data-label="Prefix">${h.prefix}</td>
                         <td data-label="Contact">${h.contact || 'N/A'}</td>
                         <td data-label="Status"><span class="tag" style="${h.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${h.is_active ? 'Active' : 'Paused'}</span></td>
-                        <td data-label="Action"><a href="#" style="color:var(--primary); text-decoration:none;" onclick="triggerExport('${h.id}', '${h.name}')">⬇ Export Excel</a></td>
+                        <td data-label="Action">
+                            <a href="#" style="color:var(--teal); text-decoration:none; margin-right: 12px; font-weight:500;" onclick="openAddStaffModal('${h.id}', '${h.name}')">+ Add Staff</a>
+                            <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="triggerExport('${h.id}', '${h.name}')">⬇ Export</a>
+                            <a href="#" style="color:#FF5A5F; text-decoration:none;" onclick="deleteHospital('${h.id}', '${h.name}')">🗑️ Delete</a>
+                        </td>
                     </tr>`;
                 });
             } else {
@@ -350,6 +355,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: document.getElementById('hospName').value,
+                    prefix: document.getElementById('hospPrefix').value,
                     contact: document.getElementById('hospContact').value,
                     admin_phone: document.getElementById('hospAdminPhone').value,
                     admin_pin: document.getElementById('hospAdminPin').value
@@ -365,6 +371,35 @@
             alert("Error: " + err.message);
         }
     });
+
+    function openAddStaffModal(hospId, hospName) {
+        document.getElementById('staffHospId').value = hospId;
+        document.getElementById('staffHospNameDisplay').innerText = "Assigning to: " + hospName;
+        openModal('addStaffModal');
+    }
+
+    window.deleteHospital = async function(id, name) {
+        if(!confirm(`Are you absolutely sure you want to DELETE ${name}?\n\nWARNING: This will permanently erase all staff, doctors, patients, and records for this hospital.`)) return;
+        
+        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number:");
+        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
+        
+        if(!phone || !pin) return;
+
+        try {
+            const res = await fetch('/api/delete_hospital', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hospital_id: id, admin_phone: phone, admin_pin: pin })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast('Hospital deleted permanently!');
+            loadData();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    };
 
     document.getElementById('addStaffForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();

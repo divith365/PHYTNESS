@@ -3,9 +3,9 @@ import { getSupabaseConfig, logAudit } from './shared.js';
 export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
-    const { name, prefix, address, contact, admin_phone, admin_pin } = data;
+    const { hospital_id, admin_phone, admin_pin } = data;
 
-    if (!name || !prefix || !contact || !admin_phone || !admin_pin) {
+    if (!hospital_id || !admin_phone || !admin_pin) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
     }
 
@@ -18,32 +18,34 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: "Unauthorized Admin" }), { status: 401 });
     }
 
-    // 2. Insert Hospital
-    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals`, {
-      method: 'POST',
-      headers: { ...headers, 'Prefer': 'return=representation' },
-      body: JSON.stringify({ name, prefix: prefix.toUpperCase(), address, contact })
+    // Fetch hospital name for logging before deleting
+    const hospRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals?id=eq.${hospital_id}&select=name`, { headers });
+    const hospData = await hospRes.json();
+    const hospName = (hospData && hospData.length > 0) ? hospData[0].name : 'Unknown Hospital';
+
+    // 2. Delete Hospital (Cascades to staff, doctors, patients, etc.)
+    const deleteRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals?id=eq.${hospital_id}`, {
+      method: 'DELETE',
+      headers: headers
     });
     
-    if (!insertRes.ok) {
-        const err = await insertRes.json();
-        return new Response(JSON.stringify({ error: err.message }), { status: insertRes.status });
+    if (!deleteRes.ok) {
+        const err = await deleteRes.json();
+        return new Response(JSON.stringify({ error: err.message }), { status: deleteRes.status });
     }
-    const inserted = await insertRes.json();
-    const newHospital = inserted[0];
 
     // 3. Log Audit
     await logAudit(env, {
-        hospital_id: newHospital.id,
+        hospital_id: hospital_id, // Keeping ID even though it's deleted for historical trace
         user_type: 'Admin',
         user_id: authData[0].id,
-        action: 'ADD_HOSPITAL',
+        action: 'DELETE_HOSPITAL',
         target_type: 'Hospital',
-        target_id: newHospital.id,
-        details: `Created new hospital: ${name}`
+        target_id: hospital_id,
+        details: `Deleted hospital: ${hospName}`
     });
 
-    return new Response(JSON.stringify({ success: true, hospital: newHospital }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200, headers: { 'Content-Type': 'application/json' }
     });
 
