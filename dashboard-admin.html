@@ -89,14 +89,14 @@
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('hospitals', this)">Hospitals Directory</button>
+      <button class="tab active" onclick="switchTab('dashboard', this)">Hospitals</button>
       <button class="tab" onclick="switchTab('staff', this)">Global Staff & Therapists</button>
       <button class="tab" onclick="switchTab('audit', this)">Security & Audit Logs</button>
       <button class="tab" onclick="switchTab('testing', this)">Diagnostics & Testing</button>
     </div>
 
-    <!-- Hospitals Tab -->
-    <div id="hospitals" class="tab-content active">
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
       <div class="card">
         <table>
           <thead><tr><th>Hospital / Centre</th><th>Login Prefix</th><th>Contact / Location</th><th>Status</th><th>Action</th></tr></thead>
@@ -236,6 +236,59 @@
     </div>
   </div>
 
+  <!-- Edit Hospital Modal -->
+  <div class="modal-overlay" id="editHospitalModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>Edit Hospital</h2>
+        <button class="close-btn" onclick="closeModal('editHospitalModal')">×</button>
+      </div>
+      <form id="editHospitalForm">
+        <input type="hidden" id="editHospId">
+        <div class="form-group">
+          <label>Hospital Name</label>
+          <input type="text" id="editHospName" required>
+        </div>
+        <div class="form-group">
+          <label>Login Prefix</label>
+          <input type="text" id="editHospPrefix" required maxlength="4" style="text-transform: uppercase;">
+        </div>
+        <div class="form-group">
+          <label>Contact Email/Phone</label>
+          <input type="text" id="editHospContact" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Staff Modal -->
+  <div class="modal-overlay" id="editStaffModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>Edit Profile</h2>
+        <button class="close-btn" onclick="closeModal('editStaffModal')">×</button>
+      </div>
+      <form id="editStaffForm">
+        <input type="hidden" id="editStaffId">
+        <input type="hidden" id="editStaffRoleType">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editStaffName" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="editStaffPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Assigned Hospital</label>
+          <select id="editStaffHosp" required></select>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Auth Modal (Reused for Purge, Export, Testing) -->
   <div class="modal-overlay" id="authActionModal">
     <div class="modal-content" style="max-width: 400px;">
@@ -281,7 +334,6 @@
     let globalStaffList = [];
     let globalHospMap = {};
 
-    // Password Toggle
     window.toggleModalPassword = function(inputId, iconEl) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -293,9 +345,8 @@
       }
     };
 
-    // 1-Hour Inactivity Timeout
     let inactivityTimer;
-    const TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+    const TIMEOUT_MS = 60 * 60 * 1000; 
 
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
@@ -320,7 +371,6 @@
             const data = await res.json();
             if(!res.ok) throw new Error(data.error);
 
-            // Populate Hospitals & Global Maps
             globalHospMap = {};
             const hospBody = document.getElementById('hospitalsTableBody');
             const hospFilter = document.getElementById('filterStaffHosp');
@@ -329,7 +379,7 @@
 
             if (data.hospitals && data.hospitals.length > 0) {
                 data.hospitals.forEach(h => {
-                    globalHospMap[h.id] = h.name; // Store for staff mapping
+                    globalHospMap[h.id] = h.name; 
                     hospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
                     hospBody.innerHTML += `<tr>
                         <td data-label="Hospital">${h.name}</td>
@@ -337,9 +387,9 @@
                         <td data-label="Contact">${h.contact || 'N/A'}</td>
                         <td data-label="Status"><span class="tag" style="${h.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${h.is_active ? 'Active' : 'Paused'}</span></td>
                         <td data-label="Action">
-                            <a href="#" style="color:var(--teal); text-decoration:none; margin-right: 12px; font-weight:500;" onclick="openAddStaffModal('${h.id}', '${h.name}')">+ Add Staff</a>
-                            <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="triggerExport('${h.id}', '${h.name}')">⬇ Export</a>
-                            <a href="#" style="color:#FF5A5F; text-decoration:none;" onclick="deleteHospital('${h.id}', '${h.name}')">🗑️ Delete</a>
+                            <a href="#" style="background:var(--primary); color:white; padding: 5px 10px; border-radius: 4px; text-decoration:none; margin-right: 12px; font-size: 0.8rem; font-weight:500;" onclick="openAddStaffModal('${h.id}', '${h.name.replace(/'/g, "\\'")}')">+ Add Staff</a>
+                            <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="openEditHospitalModal('${h.id}', '${h.name.replace(/'/g, "\\'")}', '${h.prefix}', '${h.contact || ''}')">✏️ Edit</a>
+                            <a href="#" style="color:#FF5A5F; text-decoration:none;" onclick="deleteHospital('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🗑️ Delete</a>
                         </td>
                     </tr>`;
                 });
@@ -347,11 +397,9 @@
                 hospBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hospitals found.</td></tr>';
             }
 
-            // Populate Staff
             globalStaffList = data.staff || [];
             renderStaffTable();
 
-            // Populate Audit Logs
             const auditBody = document.getElementById('auditTableBody');
             auditBody.innerHTML = '';
             if (data.logs && data.logs.length > 0) {
@@ -403,7 +451,10 @@
                     <td data-label="ID"><strong>${s.login_id}</strong></td>
                     <td data-label="Assigned Hospital">${hospName}</td>
                     <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
-                    <td data-label="Action">${actionBtn}</td>
+                    <td data-label="Action">
+                        <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="openEditStaffModal('${s.id}', '${s.full_name.replace(/'/g, "\\'")}', '${s.phone || ''}', '${s.role_type}', '${s.hospital_id}')">✏️ Edit</a>
+                        ${actionBtn}
+                    </td>
                 </tr>`;
             });
         } else {
@@ -437,6 +488,89 @@
             showToast('Hospital created successfully!');
             closeModal('addHospitalModal');
             document.getElementById('addHospitalForm').reset();
+            loadData();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    });
+
+    window.openEditHospitalModal = function(id, name, prefix, contact) {
+        document.getElementById('editHospId').value = id;
+        document.getElementById('editHospName').value = name;
+        document.getElementById('editHospPrefix').value = prefix;
+        document.getElementById('editHospContact').value = contact;
+        openModal('editHospitalModal');
+    };
+
+    document.getElementById('editHospitalForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number to authorize this edit:");
+        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
+        if(!phone || !pin) return;
+
+        try {
+            const res = await fetch('/api/edit_hospital', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    hospital_id: document.getElementById('editHospId').value,
+                    name: document.getElementById('editHospName').value,
+                    prefix: document.getElementById('editHospPrefix').value,
+                    contact: document.getElementById('editHospContact').value,
+                    admin_phone: phone,
+                    admin_pin: pin
+                })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast('Hospital updated successfully!');
+            closeModal('editHospitalModal');
+            loadData();
+        } catch(err) {
+            alert("Error: " + err.message);
+        }
+    });
+
+    window.openEditStaffModal = function(id, name, phone, role, hospId) {
+        document.getElementById('editStaffId').value = id;
+        document.getElementById('editStaffRoleType').value = role;
+        document.getElementById('editStaffName').value = name;
+        document.getElementById('editStaffPhone').value = phone;
+        
+        const hospDropdown = document.getElementById('editStaffHosp');
+        hospDropdown.innerHTML = '';
+        Object.keys(globalHospMap).forEach(key => {
+            hospDropdown.innerHTML += `<option value="${key}">${globalHospMap[key]}</option>`;
+        });
+        hospDropdown.value = hospId;
+        
+        openModal('editStaffModal');
+    };
+
+    document.getElementById('editStaffForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const phone = prompt("SECURITY CHECK: Enter your Admin Phone Number to authorize this edit:");
+        const pin = prompt("SECURITY CHECK: Enter your Admin PIN:");
+        if(!phone || !pin) return;
+
+        try {
+            const res = await fetch('/api/edit_staff', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    staff_id: document.getElementById('editStaffId').value,
+                    role_type: document.getElementById('editStaffRoleType').value,
+                    hospital_id: document.getElementById('editStaffHosp').value,
+                    full_name: document.getElementById('editStaffName').value,
+                    phone: document.getElementById('editStaffPhone').value,
+                    admin_phone: phone,
+                    admin_pin: pin
+                })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error);
+            showToast('Profile updated successfully!');
+            closeModal('editStaffModal');
             loadData();
         } catch(err) {
             alert("Error: " + err.message);
