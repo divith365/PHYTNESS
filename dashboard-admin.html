@@ -191,8 +191,7 @@
     <!-- Dashboard Tab -->
     <div id="dashboard" class="tab-content active">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">Hospitals Directory</h3>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
           <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('hospitalsTable', 'Hospitals Directory')" title="Download PDF">⬇️</button>
         </div>
         <table id="hospitalsTable">
@@ -230,12 +229,9 @@
     <!-- Audit Logs Tab -->
     <div id="audit" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">Audit Trail</h3>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('auditTable', 'Security & Audit Logs')" title="Download PDF">⬇️</button>
-            <button class="btn-logout" style="border-color: #FF5A5F; color: #FF5A5F; padding: 6px 12px; font-size: 0.85rem;" onclick="triggerPurgeLogs()">Purge Logs</button>
-          </div>
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px; gap: 10px;">
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('auditTable', 'Security & Audit Logs')" title="Download PDF">⬇️</button>
+          <button class="btn-logout" style="border-color: #FF5A5F; color: #FF5A5F; padding: 6px 12px; font-size: 0.85rem;" onclick="triggerPurgeLogs()">Purge Logs</button>
         </div>
         <table id="auditTable"><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="auditTableBody"><tr><td colspan="4" style="text-align:center;">Loading logs...</td></tr></tbody></table>
       </div>

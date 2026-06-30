@@ -248,12 +248,9 @@
     <!-- My Patients -->
     <div id="myPatients" class="tab-content active">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">My Patients</h3>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('myPatientsTable', 'My Patients')" title="Download PDF">⬇️</button>
-            <button id="btnDeleteSelectedMy" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.my-patient-checkbox')">Delete Selected</button>
-          </div>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px; gap: 10px;">
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('myPatientsTable', 'My Patients')" title="Download PDF">⬇️</button>
+          <button id="btnDeleteSelectedMy" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.my-patient-checkbox')">Delete Selected</button>
         </div>
         <table id="myPatientsTable">
           <thead>
@@ -272,12 +269,9 @@
     <!-- All Patients -->
     <div id="allPatients" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">All Centre Patients</h3>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('allPatientsTable', 'All Centre Patients')" title="Download PDF">⬇️</button>
-            <button id="btnDeleteSelectedAll" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.all-patient-checkbox')">Delete Selected</button>
-          </div>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px; gap: 10px;">
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('allPatientsTable', 'All Centre Patients')" title="Download PDF">⬇️</button>
+          <button id="btnDeleteSelectedAll" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.all-patient-checkbox')">Delete Selected</button>
         </div>
         <table id="allPatientsTable">
           <thead>
@@ -297,8 +291,7 @@
     <!-- Staff Directory -->
     <div id="staffDirectory" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">Staff Directory</h3>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
           <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('staffDirTable', 'Staff Directory')" title="Download PDF">⬇️</button>
         </div>
         <table id="staffDirTable">
@@ -317,8 +310,7 @@
     <!-- Doctor Directory -->
     <div id="doctorDirectory" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="font-family: 'Outfit'; color: var(--text);">Doctors Directory</h3>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
           <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('doctorDirTable', 'Doctors Directory')" title="Download PDF">⬇️</button>
         </div>
         <table id="doctorDirTable">
@@ -727,6 +719,8 @@
         closeModal('addPatientModal');
         e.target.reset();
         loadPatients(); // Refresh the DOM with the new patient
+        document.getElementById('statTotalPat').innerText = parseInt(document.getElementById('statTotalPat').innerText) + 1;
+        document.getElementById('statMyPat').innerText = parseInt(document.getElementById('statMyPat').innerText) + 1;
       } catch (err) {
         showToast("Error connecting to server", "error");
       }
