@@ -248,16 +248,20 @@
     <!-- My Patients -->
     <div id="myPatients" class="tab-content active">
       <div class="card">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-          <button id="btnDeleteSelectedMy" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.my-patient-checkbox')">Delete Selected</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">My Patients</h3>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('myPatientsTable', 'My Patients')" title="Download PDF">⬇️</button>
+            <button id="btnDeleteSelectedMy" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.my-patient-checkbox')">Delete Selected</button>
+          </div>
         </div>
-        <table>
+        <table id="myPatientsTable">
           <thead>
             <tr>
-              <th style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.my-patient-checkbox')"></th>
+              <th class="no-pdf" style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.my-patient-checkbox')"></th>
               <th>Patient Info</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th class="no-pdf">Actions</th>
             </tr>
           </thead>
           <tbody id="myPatientList"></tbody>
@@ -268,17 +272,21 @@
     <!-- All Patients -->
     <div id="allPatients" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-          <button id="btnDeleteSelectedAll" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.all-patient-checkbox')">Delete Selected</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">All Centre Patients</h3>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('allPatientsTable', 'All Centre Patients')" title="Download PDF">⬇️</button>
+            <button id="btnDeleteSelectedAll" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients('.all-patient-checkbox')">Delete Selected</button>
+          </div>
         </div>
-        <table>
+        <table id="allPatientsTable">
           <thead>
             <tr>
-              <th style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.all-patient-checkbox')"></th>
+              <th class="no-pdf" style="width: 40px;"><input type="checkbox" onclick="toggleAllCheckboxes(this, '.all-patient-checkbox')"></th>
               <th>Patient Info</th>
               <th>Assigned Doctor</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th class="no-pdf">Actions</th>
             </tr>
           </thead>
           <tbody id="allPatientList"></tbody>
@@ -289,7 +297,11 @@
     <!-- Staff Directory -->
     <div id="staffDirectory" class="tab-content">
       <div class="card">
-        <table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">Staff Directory</h3>
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('staffDirTable', 'Staff Directory')" title="Download PDF">⬇️</button>
+        </div>
+        <table id="staffDirTable">
           <thead>
             <tr>
               <th>Staff ID</th>
@@ -305,7 +317,11 @@
     <!-- Doctor Directory -->
     <div id="doctorDirectory" class="tab-content">
       <div class="card">
-        <table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">Doctors Directory</h3>
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('doctorDirTable', 'Doctors Directory')" title="Download PDF">⬇️</button>
+        </div>
+        <table id="doctorDirTable">
           <thead>
             <tr>
               <th>Doctor ID</th>
@@ -502,11 +518,11 @@
             // All Patients Row
             allPatientList.innerHTML += `
             <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openEditPatient('${p.id}')">
-              <td><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
+              <td class="no-pdf"><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
               <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
-              <td data-label="Actions">
+              <td class="no-pdf" data-label="Actions">
                 <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
               </td>
             </tr>`;
@@ -514,10 +530,10 @@
             if (isMine) {
                 myPatientList.innerHTML += `
                 <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">
-                  <td><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
+                  <td class="no-pdf"><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
                   <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
-                  <td data-label="Actions">
+                  <td class="no-pdf" data-label="Actions">
                     <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">View</a>
                     <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
                   </td>
@@ -639,6 +655,7 @@
     }
 
     function downloadTreatmentPDF() {
+      if(!confirm("Do you want to download this treatment log as a PDF?")) return;
       const element = document.querySelector('#treatmentModal .modal-content').cloneNode(true);
       // Remove all elements that should not be in the PDF
       element.querySelectorAll('.no-pdf').forEach(el => el.remove());
@@ -647,7 +664,20 @@
       element.style.border = 'none';
       element.style.padding = '30px';
       
+      const docName = sessionStorage.getItem('doctorName') || 'Doctor';
       const patientName = document.getElementById('treatmentPatientName').innerText.split(' - ')[0];
+      
+      const wrapper = document.createElement('div');
+      wrapper.style.backgroundColor = 'white';
+      wrapper.innerHTML = `
+        <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin: 30px;">
+            <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+            <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">Treatment Log</h2>
+            <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${docName} (Doctor) on ${new Date().toLocaleString('en-IN')}</p>
+        </div>
+      `;
+      wrapper.appendChild(element);
+
       const opt = {
         margin:       0.5,
         filename:     `${patientName.replace(/\\s+/g, '_')}_Treatment_Log.pdf`,
@@ -656,7 +686,7 @@
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
       
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(wrapper).save();
     }
 
     function markCompleted() {
@@ -817,6 +847,50 @@
         showToast("Error connecting to server", "error");
       }
     });
+
+    function downloadTableAsPDF(tableId, title) {
+        if(!confirm("Do you want to download this table as a PDF?")) return;
+        
+        const table = document.getElementById(tableId).cloneNode(true);
+        // Remove non-printable elements
+        table.querySelectorAll('.no-pdf').forEach(e => e.remove());
+        
+        const wrapper = document.createElement('div');
+        wrapper.style.padding = '30px';
+        wrapper.style.backgroundColor = 'white';
+        
+        const docName = sessionStorage.getItem('doctorName') || 'Doctor';
+        
+        wrapper.innerHTML = `
+            <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+                <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">${title}</h2>
+                <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${docName} (Doctor) on ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+        `;
+        
+        // Basic styling to ensure the table looks good in the PDF
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.querySelectorAll('th, td').forEach(cell => {
+            cell.style.border = '1px solid #e2e8f0';
+            cell.style.padding = '10px';
+            cell.style.textAlign = 'left';
+            cell.style.fontSize = '0.9rem';
+        });
+        
+        wrapper.appendChild(table);
+        
+        const opt = {
+            margin:       0.5,
+            filename:     `${title.replace(/\\s+/g, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+        
+        html2pdf().set(opt).from(wrapper).save();
+    }
   </script>
 </body>
 </html>

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Staff Dashboard - Phytness</title>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -225,17 +227,21 @@
     <!-- All Patients -->
     <div id="allPatients" class="tab-content active">
       <div class="card">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-          <button id="btnDeleteSelected" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients()">Delete Selected</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">Patient Directory</h3>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('allPatientsTable', 'Patient Directory')" title="Download PDF">⬇️</button>
+            <button id="btnDeleteSelected" class="btn-primary" style="background: #ef4444; display: none;" onclick="deleteSelectedPatients()">Delete Selected</button>
+          </div>
         </div>
-        <table>
+        <table id="allPatientsTable">
           <thead>
             <tr>
-              <th style="width: 40px;"><input type="checkbox" id="selectAllPatients" onclick="toggleAllCheckboxes(this)"></th>
+              <th class="no-pdf" style="width: 40px;"><input type="checkbox" id="selectAllPatients" onclick="toggleAllCheckboxes(this)"></th>
               <th>Patient Info</th>
               <th>Assigned Doctor</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th class="no-pdf">Actions</th>
             </tr>
           </thead>
           <tbody id="patientListBody">
@@ -266,7 +272,11 @@
     <!-- Staff Directory -->
     <div id="staffDirectory" class="tab-content">
       <div class="card">
-        <table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">Staff Directory</h3>
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('staffDirTable', 'Staff Directory')" title="Download PDF">⬇️</button>
+        </div>
+        <table id="staffDirTable">
           <thead>
             <tr>
               <th>Staff ID</th>
@@ -282,7 +292,11 @@
     <!-- Doctor Directory -->
     <div id="doctorDirectory" class="tab-content">
       <div class="card">
-        <table>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-family: 'Outfit'; color: var(--text);">Doctors Directory</h3>
+          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('doctorDirTable', 'Doctors Directory')" title="Download PDF">⬇️</button>
+        </div>
+        <table id="doctorDirTable">
           <thead>
             <tr>
               <th>Doctor ID</th>
@@ -448,11 +462,11 @@
             const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
             tbody.innerHTML += `
             <tr>
-              <td><input type="checkbox" class="patient-checkbox" value="${p.id}" onclick="updateDeleteBtn()"></td>
+              <td class="no-pdf"><input type="checkbox" class="patient-checkbox" value="${p.id}" onclick="updateDeleteBtn()"></td>
               <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span></td>
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
-              <td data-label="Actions">
+              <td class="no-pdf" data-label="Actions">
                 <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
               </td>
             </tr>`;
@@ -699,6 +713,49 @@
         showToast("Error connecting to server", "error");
       }
     });
+    function downloadTableAsPDF(tableId, title) {
+        if(!confirm("Do you want to download this table as a PDF?")) return;
+        
+        const table = document.getElementById(tableId).cloneNode(true);
+        // Remove non-printable elements
+        table.querySelectorAll('.no-pdf').forEach(e => e.remove());
+        
+        const wrapper = document.createElement('div');
+        wrapper.style.padding = '30px';
+        wrapper.style.backgroundColor = 'white';
+        
+        const staffName = sessionStorage.getItem('staffName') || 'Staff';
+        
+        wrapper.innerHTML = `
+            <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
+                <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+                <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">${title}</h2>
+                <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${staffName} (Staff) on ${new Date().toLocaleString('en-IN')}</p>
+            </div>
+        `;
+        
+        // Basic styling to ensure the table looks good in the PDF
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.querySelectorAll('th, td').forEach(cell => {
+            cell.style.border = '1px solid #e2e8f0';
+            cell.style.padding = '10px';
+            cell.style.textAlign = 'left';
+            cell.style.fontSize = '0.9rem';
+        });
+        
+        wrapper.appendChild(table);
+        
+        const opt = {
+            margin:       0.5,
+            filename:     `${title.replace(/\\s+/g, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+        
+        html2pdf().set(opt).from(wrapper).save();
+    }
   </script>
 </body>
 </html>
