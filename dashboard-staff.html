@@ -193,9 +193,25 @@
   </nav>
 
   <div class="container">
-    <div class="header">
+    <div class="header" style="margin-bottom: 20px;">
       <h1>Welcome, <span id="staffNameDisplay" style="color: var(--primary);">Staff Member</span></h1>
       <button class="btn-primary" onclick="openAddPatientModal()">+ Register Patient</button>
+    </div>
+
+    <!-- Staff Stats Row -->
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+      <div class="card" style="flex: 1; min-width: 120px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.85rem; font-weight: 500;">Total Patients</h3>
+        <p id="statTotalPat" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
+      <div class="card" style="flex: 1; min-width: 120px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.85rem; font-weight: 500;">Total Doctors</h3>
+        <p id="statTotalDoc" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
+      <div class="card" style="flex: 1; min-width: 120px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.85rem; font-weight: 500;">Total Staff</h3>
+        <p id="statTotalStaff" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
     </div>
 
     <div class="tabs" style="display: flex; align-items: center; gap: 10px;">
@@ -426,6 +442,7 @@
         tbody.innerHTML = '';
         allPatientsData = patients;
         if (res.ok && Array.isArray(patients)) {
+          document.getElementById('statTotalPat').innerText = patients.length;
           patients.forEach(p => {
             const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
             const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
@@ -457,6 +474,7 @@
         const res = await fetch(`/api/list_doctors?hospital_id=${hospId}`);
         const doctors = await res.json();
         if (res.ok && Array.isArray(doctors)) {
+          document.getElementById('statTotalDoc').innerText = doctors.length;
           const select = document.getElementById('patDoctor');
           const editSelect = document.getElementById('editPatDoctor');
           select.innerHTML = '<option value="">-- Unassigned --</option>'; // clear loading state
@@ -482,6 +500,7 @@
         const res = await fetch(`/api/list_staff?hospital_id=${hospId}`);
         const staff = await res.json();
         if (res.ok && Array.isArray(staff)) {
+          document.getElementById('statTotalStaff').innerText = staff.length;
           const tbody = document.getElementById('staffListBody');
           tbody.innerHTML = '';
           staff.forEach(s => {

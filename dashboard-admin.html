@@ -153,10 +153,30 @@
   </nav>
 
   <div class="container">
-    <div class="header">
+    <div class="header" style="margin-bottom: 20px;">
       <h1>Global Operations Overview</h1>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <button class="btn-primary" onclick="openModal('addHospitalModal')">+ Add Hospital</button>
+      </div>
+    </div>
+
+    <!-- Global Stats Row -->
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+      <div class="card" style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Total Hospitals</h3>
+        <p id="statTotalHosp" style="font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
+      <div class="card" style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Total Staff</h3>
+        <p id="statTotalStaff" style="font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
+      <div class="card" style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Total Doctors</h3>
+        <p id="statTotalDoc" style="font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
+      </div>
+      <div class="card" style="flex: 1; min-width: 150px; text-align: center; padding: 15px; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <h3 style="color: #64748B; font-size: 0.9rem; font-weight: 500;">Total Patients</h3>
+        <p id="statTotalPat" style="font-size: 1.8rem; font-weight: 700; color: var(--primary-dark); margin-top: 5px;">0</p>
       </div>
     </div>
 
@@ -436,16 +456,28 @@
             hospFilter.innerHTML = '<option value="">All Hospitals</option>';
 
             if (data.hospitals && data.hospitals.length > 0) {
+                // Populate global stats
+                const allStaff = data.staff || [];
+                const allPatients = data.patients || [];
+                document.getElementById('statTotalHosp').innerText = data.hospitals.length;
+                document.getElementById('statTotalStaff').innerText = allStaff.filter(s => s.role_type === 'Staff').length;
+                document.getElementById('statTotalDoc').innerText = allStaff.filter(s => s.role_type === 'Doctor').length;
+                document.getElementById('statTotalPat').innerText = allPatients.length;
+
                 data.hospitals.forEach(h => {
                     globalHospMap[h.id] = h.name; 
                     hospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
                     
+                    const hStaffCount = allStaff.filter(s => s.hospital_id === h.id && s.role_type === 'Staff').length;
+                    const hDocCount = allStaff.filter(s => s.hospital_id === h.id && s.role_type === 'Doctor').length;
+                    const hPatCount = allPatients.filter(p => p.hospital_id === h.id).length;
+
                     const hospActionBtn = h.is_active 
                         ? `<a href="#" style="color:#F59E0B; text-decoration:none; font-weight:500; margin-right:12px;" onclick="toggleStatus('Hospital', '${h.id}', false, '${h.name.replace(/'/g, "\\'")}')">⏸ Pause</a>`
                         : `<a href="#" style="color:#10B981; text-decoration:none; font-weight:500; margin-right:12px;" onclick="toggleStatus('Hospital', '${h.id}', true, '${h.name.replace(/'/g, "\\'")}')">▶ Activate</a>`;
 
                     hospBody.innerHTML += `<tr>
-                        <td data-label="Hospital">${h.name}</td>
+                        <td data-label="Hospital"><strong>${h.name}</strong><br><span style="font-size:0.8rem; color:#888;">${hDocCount} Doctors | ${hStaffCount} Staff | ${hPatCount} Patients</span></td>
                         <td data-label="Prefix">${h.prefix}</td>
                         <td data-label="Contact">${h.contact || 'N/A'}</td>
                         <td data-label="Status"><span class="tag" style="${h.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${h.is_active ? 'Active' : 'Paused'}</span></td>
