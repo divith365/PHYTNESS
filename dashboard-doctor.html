@@ -269,6 +269,12 @@
     <!-- All Patients -->
     <div id="allPatients" class="tab-content">
       <div class="card">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+          <input type="text" id="filterAllPatName" placeholder="Search by name or ID..." style="flex:1; min-width: 200px; padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" oninput="renderAllPatients()">
+          <select id="filterAllPatDoc" style="padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" onchange="renderAllPatients()">
+            <option value="">All Doctors</option>
+          </select>
+        </div>
         <table id="allPatientsTable">
           <thead>
             <tr>
@@ -491,38 +497,11 @@
         if (res.ok && Array.isArray(patients)) {
           document.getElementById('statTotalPat').innerText = patients.length;
           let myCount = 0;
-          patients.forEach(p => {
-            const isMine = (p.assigned_doctor_id === userId);
-            if (isMine) myCount++;
-            const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
-            const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
-            
-            // All Patients Row
-            allPatientList.innerHTML += `
-            <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openEditPatient('${p.id}')">
-              <td class="no-pdf"><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
-              <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
-              <td data-label="Assigned Doctor">${docName}</td>
-              <td data-label="Status">${statusTag}</td>
-              <td class="no-pdf" data-label="Actions">
-                <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
-              </td>
-            </tr>`;
-            
-            if (isMine) {
-                myPatientList.innerHTML += `
-                <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">
-                  <td class="no-pdf"><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
-                  <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
-                  <td data-label="Status">${statusTag}</td>
-                  <td class="no-pdf" data-label="Actions">
-                    <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">⚕️ Rx</a>
-                    <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
-                  </td>
-                </tr>`;
-            }
-          });
+          patients.forEach(p => { if (p.assigned_doctor_id === userId) myCount++; });
           document.getElementById('statMyPat').innerText = myCount;
+          
+          window.renderAllPatients();
+          window.renderMyPatients();
         }
         updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll');
         updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy');
@@ -533,6 +512,60 @@
     loadPatients();
     
     // Directory Loading
+    window.renderAllPatients = function() {
+      const allPatientList = document.getElementById('allPatientList');
+      if(!allPatientList) return;
+      allPatientList.innerHTML = '';
+      
+      const nameFilter = document.getElementById('filterAllPatName') ? document.getElementById('filterAllPatName').value.toLowerCase() : '';
+      const docFilter = document.getElementById('filterAllPatDoc') ? document.getElementById('filterAllPatDoc').value : '';
+
+      const filtered = allPatientsData.filter(p => {
+          if (nameFilter && !p.full_name.toLowerCase().includes(nameFilter) && !(p.pt_id && p.pt_id.toLowerCase().includes(nameFilter))) return false;
+          if (docFilter && p.assigned_doctor_id !== docFilter) return false;
+          return true;
+      });
+
+      filtered.forEach(p => {
+        const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
+        const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
+
+        allPatientList.innerHTML += `
+        <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openEditPatient('${p.id}')">
+          <td class="no-pdf"><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
+          <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+          <td data-label="Assigned Doctor">${docName}</td>
+          <td data-label="Status">${statusTag}</td>
+          <td class="no-pdf" data-label="Actions">
+            <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">⚕️ Rx</a>
+            <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
+          </td>
+        </tr>`;
+      });
+    };
+
+    window.renderMyPatients = function() {
+      const myPatientList = document.getElementById('myPatientList');
+      if(!myPatientList) return;
+      myPatientList.innerHTML = '';
+      const userId = sessionStorage.getItem('userId');
+
+      allPatientsData.filter(p => p.assigned_doctor_id === userId).forEach(p => {
+        const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
+
+        myPatientList.innerHTML += `
+        <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openEditPatient('${p.id}')">
+          <td class="no-pdf"><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
+          <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+          <td data-label="Status">${statusTag}</td>
+          <td class="no-pdf" data-label="Actions">
+            <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">⚕️ Rx</a>
+            <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
+          </td>
+        </tr>`;
+      });
+    };
+
     async function loadDoctors() {
       const hospId = sessionStorage.getItem('hospitalId');
       if (!hospId) return;
@@ -608,6 +641,7 @@
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function openTreatmentSheet(patientId, name, age, gender, phone, complaint) {
+      window.currentTreatmentPatientId = patientId;
       document.getElementById('treatmentPatientName').innerText = name + ' - Treatment Log';
       document.getElementById('treatmentPatientInfo').innerText = `Age: ${age} | Gender: ${gender} | Phone: +91-${phone} | Complaint: ${complaint}`;
       openModal('treatmentModal');
@@ -672,9 +706,22 @@
       html2pdf().set(opt).from(wrapper).save();
     }
 
-    function markCompleted() {
-      showToast("Patient treatment marked as completed! They can return later if needed.", "success");
-      // API call to update patient treatment_status to 'completed'
+    async function markCompleted() {
+      if(!window.currentTreatmentPatientId) return;
+      try {
+        const res = await fetch('/api/edit_patient', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ patient_id: window.currentTreatmentPatientId, treatment_status: 'completed' })
+        });
+        if(!res.ok) throw new Error("Failed to update status");
+        
+        showToast("Patient treatment marked as completed!", "success");
+        closeModal('treatmentModal');
+        await loadPatients();
+      } catch(e) {
+        showToast(e.message, "error");
+      }
     }
 
     document.getElementById('addPatientForm').addEventListener('submit', async (e) => {

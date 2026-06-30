@@ -731,7 +731,7 @@
       };
 
       try {
-        const res = await fetch('/api/update_patient', {
+        const res = await fetch('/api/edit_patient', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ patient_id: id, ...data })
@@ -761,7 +761,7 @@
     async function executeDeletePatient(ids) {
         try {
             for (const id of ids) {
-                const res = await fetch('/api/update_patient', {
+                const res = await fetch('/api/edit_patient', {
                     method: 'DELETE',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ patient_id: id })

@@ -1,7 +1,7 @@
 export async function onRequestPost({ request, env }) {
   try {
     const payload = await request.json();
-    const { patient_id, full_name, age, gender, phone, chief_complaint, assigned_doctor_id } = payload;
+    const { patient_id, full_name, age, gender, phone, chief_complaint, assigned_doctor_id, treatment_status } = payload;
 
     if (!patient_id) {
       return new Response(JSON.stringify({ error: "Patient ID is required" }), { status: 400 });
@@ -17,14 +17,14 @@ export async function onRequestPost({ request, env }) {
       'Prefer': 'return=representation'
     };
 
-    const updatePayload = {
-      full_name,
-      age,
-      gender,
-      phone,
-      chief_complaint,
-      assigned_doctor_id: assigned_doctor_id || null
-    };
+    const updatePayload = {};
+    if (full_name !== undefined) updatePayload.full_name = full_name;
+    if (age !== undefined) updatePayload.age = age;
+    if (gender !== undefined) updatePayload.gender = gender;
+    if (phone !== undefined) updatePayload.phone = phone;
+    if (chief_complaint !== undefined) updatePayload.chief_complaint = chief_complaint;
+    if (assigned_doctor_id !== undefined) updatePayload.assigned_doctor_id = assigned_doctor_id || null;
+    if (treatment_status !== undefined) updatePayload.treatment_status = treatment_status;
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/patients?id=eq.${encodeURIComponent(patient_id)}`, {
       method: 'PATCH',
