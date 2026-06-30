@@ -20,7 +20,7 @@ CREATE SEQUENCE staff_seq START 1;
 CREATE SEQUENCE doctor_seq START 1;
 CREATE SEQUENCE patient_seq START 1;
 
--- 1. Admins Table (Global Super Admin)
+-- 1. Admins Table (Global Admin)
 CREATE TABLE admins (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name TEXT NOT NULL,
@@ -204,4 +204,4 @@ FOR EACH STATEMENT
 EXECUTE FUNCTION rotate_audit_logs();
 
 -- Insert a default admin so you can login!
-INSERT INTO admins (full_name, phone, pin) VALUES ('Super Admin', '1234567890', '123456') ON CONFLICT (phone) DO NOTHING;
+INSERT INTO admins (full_name, phone, pin) VALUES ('Admin', '1234567890', '123456') ON CONFLICT (phone) DO NOTHING;

@@ -38,7 +38,7 @@ export async function onRequestPost({ request, env }) {
         action: 'PURGE_AUDIT',
         target_type: 'System',
         target_id: null,
-        details: `Super Admin purged all previous audit logs.`
+        details: `Admin purged all previous audit logs.`
     });
 
     return new Response(JSON.stringify({ success: true }), {

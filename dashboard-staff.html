@@ -142,7 +142,7 @@
   <div class="container">
     <div class="header">
       <h1>Welcome, <span id="staffNameDisplay" style="color: var(--primary);">Staff Member</span></h1>
-      <button class="btn-primary" onclick="openModal('addPatientModal')">+ Register Patient</button>
+      <button class="btn-primary" onclick="openAddPatientModal()">+ Register Patient</button>
     </div>
 
     <div class="tabs" style="display: flex; align-items: center; gap: 10px;">
@@ -356,6 +356,12 @@
     const hospId = sessionStorage.getItem('hospitalId');
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
+    // Set Welcome Name
+    const uName = sessionStorage.getItem('userName');
+    if (uName) {
+      document.getElementById('staffNameDisplay').innerText = uName + ' - Staff';
+    }
+
     // Fetch and render patients
     let allPatientsData = [];
     async function loadPatients() {
@@ -467,6 +473,11 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    async function openAddPatientModal() {
+      await loadDoctors();
+      openModal('addPatientModal');
+    }
+
     document.getElementById('addPatientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -572,9 +583,10 @@
     }
 
     // Edit Patient Logic
-    function openEditPatient(id) {
+    async function openEditPatient(id) {
       const patient = allPatientsData.find(p => p.id === id);
       if(!patient) return;
+      await loadDoctors();
       document.getElementById('editPatId').value = patient.id;
       document.getElementById('editPatName').value = patient.full_name;
       document.getElementById('editPatAge').value = patient.age;

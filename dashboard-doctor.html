@@ -378,6 +378,13 @@
     const hName = sessionStorage.getItem('hospitalName');
     if (hName) document.getElementById('hospNameHeader').innerText = `- ${hName}`;
 
+    // Set Welcome Name
+    const uName = sessionStorage.getItem('userName');
+    if (uName) {
+      const docPrefix = uName.startsWith('Dr.') ? uName : 'Dr. ' + uName;
+      document.getElementById('doctorNameDisplay').innerText = docPrefix + ' - Doctor';
+    }
+
     // Fetch and render patients
     let allPatientsData = [];
     async function loadPatients() {
@@ -402,9 +409,9 @@
             
             // All Patients Row
             allPatientList.innerHTML += `
-            <tr>
+            <tr style="cursor: pointer;" onclick="if(!['INPUT','A'].includes(event.target.tagName)) openEditPatient('${p.id}')">
               <td><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
-              <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+              <td data-label="Patient Info"><a href="#" style="color:var(--text); text-decoration:none;" onclick="openEditPatient('${p.id}')"><strong>${p.full_name}</strong></a><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
               <td data-label="Actions">
@@ -414,12 +421,12 @@
             
             if (isMine) {
                 myPatientList.innerHTML += `
-                <tr>
+                <tr style="cursor: pointer;" onclick="if(!['INPUT','A'].includes(event.target.tagName)) openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">
                   <td><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
-                  <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+                  <td data-label="Patient Info"><a href="#" style="color:var(--text); text-decoration:none;" onclick="openEditPatient('${p.id}')"><strong>${p.full_name}</strong></a><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
                   <td data-label="Actions">
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">View Rx</a>
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">Rx</a>
                     <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
                   </td>
                 </tr>`;
@@ -653,9 +660,10 @@
     }
 
     // Edit Patient Logic
-    function openEditPatient(id) {
+    async function openEditPatient(id) {
       const patient = allPatientsData.find(p => p.id === id);
       if(!patient) return;
+      await loadDoctors();
       document.getElementById('editPatId').value = patient.id;
       document.getElementById('editPatName').value = patient.full_name;
       document.getElementById('editPatAge').value = patient.age;

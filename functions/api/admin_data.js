@@ -11,7 +11,7 @@ export async function onRequestPost({ request, env }) {
     const adminRes = await fetch(`${SUPABASE_URL}/rest/v1/admins?phone=eq.${admin_phone}&pin=eq.${admin_pin}&select=id`, { headers });
     const adminData = await adminRes.json();
     if (!adminRes.ok || !adminData || adminData.length === 0) {
-      return new Response(JSON.stringify({ error: "Invalid Super Admin credentials" }), { status: 401 });
+      return new Response(JSON.stringify({ error: "Invalid Admin credentials" }), { status: 401 });
     }
 
     // Fetch Data
