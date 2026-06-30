@@ -12,7 +12,7 @@ export async function onRequestGet({ request, env }) {
       'Content-Type': 'application/json'
     };
 
-    let fetchUrl = `${SUPABASE_URL}/rest/v1/doctors?select=id,full_name,specialization,phone`;
+    let fetchUrl = `${SUPABASE_URL}/rest/v1/doctors?select=id,login_id,full_name,specialization,qualification,phone`;
     if (hospId) fetchUrl += `&hospital_id=eq.${encodeURIComponent(hospId)}`;
 
     const res = await fetch(fetchUrl, { headers });
