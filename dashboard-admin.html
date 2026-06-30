@@ -61,6 +61,10 @@
     
     .tag { background: rgba(0, 212, 255, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(0, 212, 255, 0.2); }
     
+    .action-link { color: var(--primary); text-decoration: none; margin-right: 10px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: all 0.2s ease; display: inline-block; }
+    .action-link:hover { background: rgba(0, 163, 160, 0.1); transform: translateY(-1px); }
+    .action-link:active { transform: translateY(1px); }
+    
     /* Modals */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
     .modal-overlay.active { display: flex; opacity: 1; }
@@ -191,11 +195,8 @@
     <!-- Dashboard Tab -->
     <div id="dashboard" class="tab-content active">
       <div class="card">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('hospitalsTable', 'Hospitals Directory')" title="Download PDF">⬇️</button>
-        </div>
         <table id="hospitalsTable">
-          <thead><tr><th>Hospital / Centre</th><th>Login Prefix</th><th>Contact / Location</th><th>Status</th><th class="no-pdf">Action</th></tr></thead>
+          <thead><tr><th>Hospital / Centre</th><th>Login Prefix</th><th>Contact / Location</th><th>Status</th><th class="no-pdf">Action <button class="btn-logout" style="border: none; padding: 0 5px; font-size: 0.85rem;" onclick="downloadTableAsPDF('hospitalsTable', 'Hospitals Directory')" title="Download PDF">⬇️</button></th></tr></thead>
           <tbody id="hospitalsTableBody">
             <tr><td colspan="5" style="text-align:center;">Loading hospitals...</td></tr>
           </tbody>
@@ -217,10 +218,9 @@
             <option value="">All Hospitals</option>
           </select>
           <button class="btn-primary" style="background: #FF5A5F; border-color: #FF5A5F;" onclick="deleteSelectedStaff()">🗑️ Delete Selected</button>
-          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem; margin-left: auto;" onclick="downloadTableAsPDF('staffTable', 'Global Staff Directory')" title="Download PDF">⬇️</button>
         </div>
         <table id="staffTable">
-          <thead><tr><th class="no-pdf">Select</th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th class="no-pdf">Action</th></tr></thead>
+          <thead><tr><th class="no-pdf">Select</th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th class="no-pdf">Action <button class="btn-logout" style="border: none; padding: 0 5px; font-size: 0.85rem;" onclick="downloadTableAsPDF('staffTable', 'Global Staff Directory')" title="Download PDF">⬇️</button></th></tr></thead>
           <tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody>
         </table>
       </div>
@@ -229,11 +229,7 @@
     <!-- Audit Logs Tab -->
     <div id="audit" class="tab-content">
       <div class="card">
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px; gap: 10px;">
-          <button class="btn-logout" style="border: none; padding: 5px; font-size: 1.2rem;" onclick="downloadTableAsPDF('auditTable', 'Security & Audit Logs')" title="Download PDF">⬇️</button>
-          <button class="btn-logout" style="border-color: #FF5A5F; color: #FF5A5F; padding: 6px 12px; font-size: 0.85rem;" onclick="triggerPurgeLogs()">Purge Logs</button>
-        </div>
-        <table id="auditTable"><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="auditTableBody"><tr><td colspan="4" style="text-align:center;">Loading logs...</td></tr></tbody></table>
+        <table id="auditTable"><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details <button class="btn-logout" style="border-color: #FF5A5F; color: #FF5A5F; padding: 2px 8px; font-size: 0.75rem; margin: 0 10px;" onclick="triggerPurgeLogs()">Purge Logs</button><button class="btn-logout" style="border: none; padding: 0 5px; font-size: 0.85rem;" onclick="downloadTableAsPDF('auditTable', 'Security & Audit Logs')" title="Download PDF">⬇️</button></th></tr></thead><tbody id="auditTableBody"><tr><td colspan="4" style="text-align:center;">Loading logs...</td></tr></tbody></table>
       </div>
     </div>
 
@@ -488,7 +484,7 @@
                         <td data-label="Status"><span class="tag" style="${h.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${h.is_active ? 'Active' : 'Paused'}</span></td>
                         <td class="no-pdf" data-label="Action">
                             <a href="#" style="background:var(--primary); color:white; padding: 5px 10px; border-radius: 4px; text-decoration:none; margin-right: 12px; font-size: 0.8rem; font-weight:500;" onclick="openAddStaffModal('${h.id}', '${h.name.replace(/'/g, "\\'")}')">+ Add Staff</a>
-                            <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="openEditHospitalModal('${h.id}', '${h.name.replace(/'/g, "\\'")}', '${h.prefix}', '${h.contact || ''}')">✏️ Edit</a>
+                            <a href="#" class="action-link" style="margin-right: 12px;" onclick="openEditHospitalModal('${h.id}', '${h.name.replace(/'/g, "\\'")}', '${h.prefix}', '${h.contact || ''}')">✏️ Edit</a>
                             ${hospActionBtn}
                             <a href="#" style="color:#FF5A5F; text-decoration:none;" onclick="deleteHospital('${h.id}', '${h.name.replace(/'/g, "\\'")}')">🗑️ Delete</a>
                         </td>
@@ -560,7 +556,7 @@
                     <td data-label="Assigned Hospital">${hospName}</td>
                     <td data-label="Status"><span class="tag" style="${s.is_active ? '' : 'background:rgba(255,90,95,0.1); color:var(--accent);'}">${s.is_active ? 'Active' : 'Paused'}</span></td>
                     <td class="no-pdf" data-label="Action">
-                        <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 12px;" onclick="openEditStaffModal('${s.id}', '${s.full_name.replace(/'/g, "\\'")}', '${s.phone || ''}', '${s.role_type}', '${s.hospital_id}')">✏️ Edit</a>
+                        <a href="#" class="action-link" style="margin-right: 12px;" onclick="openEditStaffModal('${s.id}', '${s.full_name.replace(/'/g, "\\'")}', '${s.phone || ''}', '${s.role_type}', '${s.hospital_id}')">✏️ Edit</a>
                         ${actionBtn}
                         <a href="#" style="color:#FF5A5F; text-decoration:none; font-weight:500; margin-left:12px;" onclick="deleteSingleStaff('${s.id}', '${s.role_type}', '${s.full_name.replace(/'/g, "\\'")}')">🗑️</a>
                     </td>
@@ -942,7 +938,7 @@
         
         wrapper.innerHTML = `
             <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
-                <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+                <img src="logo_transparent.png" style="height: 120px; margin-bottom: 10px;">
                 <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">${title}</h2>
                 <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${name} (${role}) on ${new Date().toLocaleString('en-IN')}</p>
             </div>

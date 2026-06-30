@@ -62,7 +62,11 @@
     .patient-card:hover { transform: translateY(-5px); border-color: var(--primary); background: rgba(255,255,255,0.9); }
     .patient-name { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.2rem; color: var(--text); margin-bottom: 4px; }
     .patient-meta { font-size: 0.85rem; color: #888; margin-bottom: 12px; }
-    .tag { display: inline-block; background: rgba(45, 212, 191, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(45, 212, 191, 0.2); }
+    .tag { background: rgba(0, 212, 255, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(0, 212, 255, 0.2); }
+    
+    .action-link { color: var(--primary); text-decoration: none; margin-right: 10px; font-weight: 500; padding: 4px 8px; border-radius: 4px; transition: all 0.2s ease; display: inline-block; }
+    .action-link:hover { background: rgba(0, 163, 160, 0.1); transform: translateY(-1px); }
+    .action-link:active { transform: translateY(1px); }
     
     /* Treatment Sheet */
     .report-sheet { background: #fff; color: #333; border-radius: 8px; padding: 30px; margin-top: 20px; min-height: 400px; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); position: relative; }
@@ -515,7 +519,7 @@
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
               <td class="no-pdf" data-label="Actions">
-                <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
+                <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
               </td>
             </tr>`;
             
@@ -526,8 +530,8 @@
                   <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
                   <td class="no-pdf" data-label="Actions">
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">View</a>
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
+                    <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">Rx</a>
+                    <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
                   </td>
                 </tr>`;
             }
@@ -637,7 +641,7 @@
       const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const entryHtml = `
         <div class="report-entry">
-          <span class="report-date" style="color:#0f172a;"><strong style="font-size: 1.1em; color:var(--primary);">View</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
+          <span class="report-date" style="color:#0f172a;"><strong>Rx</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
           <div class="report-notes">${note}</div>
         </div>`;
       document.getElementById('existingNotes').insertAdjacentHTML('beforeend', entryHtml);
@@ -656,14 +660,15 @@
       element.style.border = 'none';
       element.style.padding = '30px';
       
-      const docName = sessionStorage.getItem('doctorName') || 'Doctor';
+      let uName = sessionStorage.getItem('userName') || 'Doctor';
+      const docName = uName.startsWith('Dr.') ? uName : 'Dr. ' + uName;
       const patientName = document.getElementById('treatmentPatientName').innerText.split(' - ')[0];
       
       const wrapper = document.createElement('div');
       wrapper.style.backgroundColor = 'white';
       wrapper.innerHTML = `
         <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin: 30px;">
-            <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+            <img src="logo_transparent.png" style="height: 120px; margin-bottom: 10px;">
             <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">Treatment Log</h2>
             <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${docName} (Doctor) on ${new Date().toLocaleString('en-IN')}</p>
         </div>
@@ -853,11 +858,12 @@
         wrapper.style.padding = '30px';
         wrapper.style.backgroundColor = 'white';
         
-        const docName = sessionStorage.getItem('doctorName') || 'Doctor';
+        let uName = sessionStorage.getItem('userName') || 'Doctor';
+        const docName = uName.startsWith('Dr.') ? uName : 'Dr. ' + uName;
         
         wrapper.innerHTML = `
             <div style="margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
-                <img src="logo_transparent.png" style="height: 60px; margin-bottom: 10px;">
+                <img src="logo_transparent.png" style="height: 120px; margin-bottom: 10px;">
                 <h2 style="font-family: 'Outfit', sans-serif; color: var(--text);">${title}</h2>
                 <p style="font-size: 0.85rem; color: #64748B;">Downloaded by: ${docName} (Doctor) on ${new Date().toLocaleString('en-IN')}</p>
             </div>
