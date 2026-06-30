@@ -301,8 +301,11 @@
     <!-- Treatment View Modal -->
     <div class="modal-overlay" id="treatmentModal">
       <div class="modal-content" style="max-width: 800px; width: 95%;">
-        <div class="modal-header">
-          <h2 id="treatmentPatientName" style="font-family: 'Outfit', sans-serif;">Patient Name</h2>
+        <div class="modal-header" style="margin-bottom: 10px;">
+          <div>
+            <h2 id="treatmentPatientName" style="font-family: 'Outfit', sans-serif; margin-bottom: 4px;">Patient Name</h2>
+            <div id="treatmentPatientInfo" style="font-size: 0.85rem; color: #64748b; font-weight: 500;"></div>
+          </div>
           <button class="close-btn" onclick="closeModal('treatmentModal')">×</button>
         </div>
         
@@ -471,25 +474,25 @@
             
             // All Patients Row
             allPatientList.innerHTML += `
-            <tr style="cursor: pointer;" onclick="if(!['INPUT','A'].includes(event.target.tagName)) openEditPatient('${p.id}')">
+            <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openEditPatient('${p.id}')">
               <td><input type="checkbox" class="patient-checkbox all-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.all-patient-checkbox', 'btnDeleteSelectedAll')"></td>
-              <td data-label="Patient Info"><a href="#" style="color:var(--text); text-decoration:none;" onclick="openEditPatient('${p.id}')"><strong>${p.full_name}</strong></a><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+              <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
               <td data-label="Assigned Doctor">${docName}</td>
               <td data-label="Status">${statusTag}</td>
               <td data-label="Actions">
-                <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
+                <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
               </td>
             </tr>`;
             
             if (isMine) {
                 myPatientList.innerHTML += `
-                <tr style="cursor: pointer;" onclick="if(!['INPUT','A'].includes(event.target.tagName)) openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">
+                <tr style="cursor: pointer;" onclick="if(!['INPUT','A','BUTTON'].includes(event.target.tagName)) openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">
                   <td><input type="checkbox" class="patient-checkbox my-patient-checkbox" value="${p.id}" onclick="updateDeleteBtn('.my-patient-checkbox', 'btnDeleteSelectedMy')"></td>
-                  <td data-label="Patient Info"><a href="#" style="color:var(--text); text-decoration:none;" onclick="openEditPatient('${p.id}')"><strong>${p.full_name}</strong></a><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
+                  <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
                   <td data-label="Actions">
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}')">Rx</a>
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="openEditPatient('${p.id}')">Edit</a>
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">Rx</a>
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
                   </td>
                 </tr>`;
             }
@@ -576,8 +579,9 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    function openTreatmentSheet(patientId, name) {
+    function openTreatmentSheet(patientId, name, age, gender, phone, complaint) {
       document.getElementById('treatmentPatientName').innerText = name + ' - Treatment Log';
+      document.getElementById('treatmentPatientInfo').innerText = `Age: ${age} | Gender: ${gender} | Phone: +91-${phone} | Complaint: ${complaint}`;
       openModal('treatmentModal');
       
       // In a real implementation, we would fetch existing treatment_logs from API here
