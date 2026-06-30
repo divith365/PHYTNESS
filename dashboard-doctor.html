@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Therapist Dashboard - Phytness</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
       --primary: #2DD4BF; --primary-dark: #14B8A6; --accent: #F59E0B;
@@ -301,15 +302,18 @@
     <!-- Treatment View Modal -->
     <div class="modal-overlay" id="treatmentModal">
       <div class="modal-content" style="max-width: 800px; width: 95%;">
-        <div class="modal-header" style="margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
           <div>
             <h2 id="treatmentPatientName" style="font-family: 'Outfit', sans-serif; margin-bottom: 4px;">Patient Name</h2>
             <div id="treatmentPatientInfo" style="font-size: 0.85rem; color: #64748b; font-weight: 500;"></div>
           </div>
-          <button class="close-btn" onclick="closeModal('treatmentModal')">×</button>
+          <div style="display: flex; gap: 10px; align-items: center;" class="no-pdf">
+            <button class="btn-logout" style="border-color: #cbd5e1; color: #475569; padding: 6px 12px; font-size: 0.85rem; background: #f8fafc;" onclick="downloadTreatmentPDF()">📄 Download PDF</button>
+            <button class="close-btn" onclick="closeModal('treatmentModal')">×</button>
+          </div>
         </div>
         
-        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <div style="display:flex; gap:10px; margin-bottom: 20px;" class="no-pdf">
             <button class="btn-logout" style="border-color: var(--primary); color: var(--primary); flex: 1;" onclick="markCompleted()">Mark Completed</button>
             <button class="btn-primary" style="flex: 1;" onclick="saveTreatment()">Save Notes</button>
         </div>
@@ -319,7 +323,7 @@
             <!-- Logs will be populated here -->
           </div>
           
-          <textarea id="newTreatmentNote" class="report-textarea" placeholder="Type new treatment notes here..."></textarea>
+          <textarea id="newTreatmentNote" class="report-textarea no-pdf" placeholder="Type new treatment notes here..."></textarea>
         </div>
       </div>
     </div>
@@ -491,7 +495,7 @@
                   <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
                   <td data-label="Actions">
-                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">Rx</a>
+                    <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">View</a>
                     <a href="#" style="color:var(--primary); text-decoration:none; margin-right: 10px;" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
                   </td>
                 </tr>`;
@@ -599,15 +603,34 @@
       const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const entryHtml = `
         <div class="report-entry">
-          <span class="report-date" style="color:#0f172a;"><strong style="font-size: 1.1em; color:var(--primary);">⚕️ Rx</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
+          <span class="report-date" style="color:#0f172a;"><strong style="font-size: 1.1em; color:var(--primary);">View</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
           <div class="report-notes">${note}</div>
         </div>`;
       document.getElementById('existingNotes').insertAdjacentHTML('beforeend', entryHtml);
       document.getElementById('newTreatmentNote').value = '';
       
-      showToast('Treatment Log Appended Successfully!', 'success');
+      showToast('Treatment notes saved!');
+    }
+
+    function downloadTreatmentPDF() {
+      const element = document.querySelector('#treatmentModal .modal-content').cloneNode(true);
+      // Remove all elements that should not be in the PDF
+      element.querySelectorAll('.no-pdf').forEach(el => el.remove());
+      // Adjust styling to ensure it looks like a clean document
+      element.style.boxShadow = 'none';
+      element.style.border = 'none';
+      element.style.padding = '30px';
       
-      // Real API call would happen here via /api/add_treatment
+      const patientName = document.getElementById('treatmentPatientName').innerText.split(' - ')[0];
+      const opt = {
+        margin:       0.5,
+        filename:     `${patientName.replace(/\\s+/g, '_')}_Treatment_Log.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
     }
 
     function markCompleted() {
