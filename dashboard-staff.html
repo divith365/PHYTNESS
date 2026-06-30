@@ -422,6 +422,17 @@
   </div>
 
   <div id="toastContainer"></div>
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">⚠️</div>
+      <h2 style="color: #FF5A5F; font-family: 'Outfit'; margin-bottom: 15px;" id="confirmModalTitle">Are you absolutely sure?</h2>
+      <p style="color: var(--text); font-size: 1.05rem; margin-bottom: 25px; line-height: 1.5;" id="confirmModalDesc"></p>
+      <div style="display: flex; gap: 15px;">
+        <button class="btn-primary" style="flex: 1; background: transparent; border: 2px solid var(--glass-border); color: var(--text);" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn-primary" style="flex: 1; background: #FF5A5F; border-color: #FF5A5F;" id="confirmModalYesBtn">Yes, Proceed</button>
+      </div>
+    </div>
+  </div>
   <script>
     // Load Hospital Name & ID
     const hName = sessionStorage.getItem('hospitalName');
@@ -545,6 +556,17 @@
       document.getElementById(tabId).classList.add('active');
     }
 
+    let confirmCallback = null;
+    window.showConfirm = function(title, desc, callback) {
+        document.getElementById('confirmModalTitle').innerText = title;
+        document.getElementById('confirmModalDesc').innerText = desc;
+        confirmCallback = callback;
+        openModal('confirmModal');
+    };
+    document.getElementById('confirmModalYesBtn')?.addEventListener('click', () => {
+        closeModal('confirmModal');
+        if(confirmCallback) confirmCallback();
+    });
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -704,7 +726,7 @@
       }
     });
     function downloadTableAsPDF(tableId, title) {
-        if(!confirm("Do you want to download this table as a PDF?")) return;
+        showConfirm("Download PDF?", "Do you want to download this table as a PDF?", () => {
         
         const table = document.getElementById(tableId).cloneNode(true);
         // Remove non-printable elements
@@ -745,6 +767,7 @@
         };
         
         html2pdf().set(opt).from(wrapper).save();
+        });
     }
   </script>
 </body>

@@ -1133,7 +1133,7 @@
     }
 
     function downloadTableAsPDF(tableId, title) {
-        if(!confirm("Do you want to download this table as a PDF?")) return;
+        showConfirm("Download PDF?", "Do you want to download this table as a PDF?", () => {
         
         const table = document.getElementById(tableId).cloneNode(true);
         // Remove non-printable elements
@@ -1175,6 +1175,7 @@
         };
         
         html2pdf().set(opt).from(wrapper).save();
+        });
     }
   </script>
 </body>
