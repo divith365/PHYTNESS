@@ -18,7 +18,7 @@ export async function onRequestPost({ request, env }) {
     const hospitalsRes = await fetch(`${SUPABASE_URL}/rest/v1/hospitals?select=id,name,prefix,contact,is_active&order=created_at.desc`, { headers });
     const staffRes = await fetch(`${SUPABASE_URL}/rest/v1/staff?select=id,login_id,full_name,is_active,hospital_id&order=created_at.desc`, { headers });
     const docRes = await fetch(`${SUPABASE_URL}/rest/v1/doctors?select=id,login_id,full_name,is_active,hospital_id&order=created_at.desc`, { headers });
-    const patientsRes = await fetch(`${SUPABASE_URL}/rest/v1/patients?select=id,hospital_id`, { headers });
+    const patientsRes = await fetch(`${SUPABASE_URL}/rest/v1/patients?select=*,doctors(full_name)&order=created_at.desc`, { headers });
     const auditRes = await fetch(`${SUPABASE_URL}/rest/v1/audit_logs?select=*&order=created_at.desc&limit=50`, { headers });
 
     const hospitals = await hospitalsRes.json();

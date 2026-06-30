@@ -530,7 +530,7 @@
                   <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span><br><span style="font-size:0.8rem; color:#666;">Chief Complaint: ${p.chief_complaint || 'None'}</span></td>
                   <td data-label="Status">${statusTag}</td>
                   <td class="no-pdf" data-label="Actions">
-                    <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">Rx</a>
+                    <a href="#" class="action-link" onclick="event.stopPropagation(); openTreatmentSheet('${p.id}', '${p.full_name.replace(/'/g, "\\'")}', '${p.age || '-'}', '${p.gender || '-'}', '${p.phone || '-'}', '${(p.chief_complaint || 'None').replace(/'/g, "\\'")}')">⚕️ Rx</a>
                     <a href="#" class="action-link" onclick="event.stopPropagation(); openEditPatient('${p.id}')">Edit</a>
                   </td>
                 </tr>`;
@@ -641,7 +641,7 @@
       const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const entryHtml = `
         <div class="report-entry">
-          <span class="report-date" style="color:#0f172a;"><strong>Rx</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
+          <span class="report-date" style="color:#0f172a;"><strong>⚕️ Rx</strong> | ${docPrefix} -- ${dateStr} (IST) - Treatment Updated</span>
           <div class="report-notes">${note}</div>
         </div>`;
       document.getElementById('existingNotes').insertAdjacentHTML('beforeend', entryHtml);

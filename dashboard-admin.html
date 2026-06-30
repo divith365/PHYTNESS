@@ -188,6 +188,7 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('dashboard', this)">Hospitals</button>
       <button class="tab" onclick="switchTab('staff', this)">Global Staff & Therapists</button>
+      <button class="tab" onclick="switchTab('patients', this)">Global Patients</button>
       <button class="tab" onclick="switchTab('audit', this)">Security & Audit Logs</button>
       <button class="tab" onclick="switchTab('testing', this)">Diagnostics & Testing</button>
     </div>
@@ -222,6 +223,26 @@
         <table id="staffTable">
           <thead><tr><th class="no-pdf">Select</th><th>Name & Role</th><th>Login ID</th><th>Assigned Hospital</th><th>Status</th><th class="no-pdf">Action <button class="btn-logout" style="border: none; padding: 0 5px; font-size: 0.85rem;" onclick="downloadTableAsPDF('staffTable', 'Global Staff Directory')" title="Download PDF">⬇️</button></th></tr></thead>
           <tbody id="staffTableBody"><tr><td colspan="5" style="text-align:center;">Loading staff...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Patients Tab -->
+    <div id="patients" class="tab-content">
+      <div class="card">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+          <input type="text" id="filterPatName" placeholder="Search by name..." style="flex:1; min-width: 200px; padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" oninput="renderPatientsTable()">
+          <select id="filterPatHosp" style="padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" onchange="renderPatientsTable()">
+            <option value="">All Hospitals</option>
+          </select>
+          <select id="filterPatDoc" style="padding: 10px; border: 1px solid var(--glass-border); border-radius: 8px; font-family: 'Poppins';" onchange="renderPatientsTable()">
+            <option value="">All Doctors</option>
+          </select>
+          <button class="btn-primary" style="background: #FF5A5F; border-color: #FF5A5F;" onclick="deleteSelectedPatients()">🗑️ Delete Selected</button>
+        </div>
+        <table id="patientsTable">
+          <thead><tr><th class="no-pdf" style="width: 40px;"><input type="checkbox" id="selectAllAdminPat" onclick="const cbs = document.querySelectorAll('.admin-patient-checkbox'); cbs.forEach(cb => cb.checked = this.checked);"></th><th>Patient Info</th><th>Assigned Hospital</th><th>Assigned Doctor</th><th>Status</th><th class="no-pdf">Action <button class="btn-logout" style="border: none; padding: 0 5px; font-size: 0.85rem;" onclick="downloadTableAsPDF('patientsTable', 'Global Patient Directory')" title="Download PDF">⬇️</button></th></tr></thead>
+          <tbody id="patientsTableBody"><tr><td colspan="6" style="text-align:center;">Loading patients...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -359,6 +380,54 @@
   </div>
 
   <!-- Beautiful Confirm Modal -->
+
+  <div id="editPatientModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Patient</h2>
+        <button class="close-btn" onclick="closeModal('editPatientModal')">×</button>
+      </div>
+      <form id="editPatientForm">
+        <input type="hidden" id="editPatId">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editPatName" required>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="editPatAge" min="1" max="120" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3); if(this.value > 120) this.value = 120;" required>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="editPatGender" required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Phone Number (10 digits)</label>
+            <input type="tel" id="editPatPhone" pattern="[6-9][0-9]{9}" title="Must be a valid 10-digit mobile number starting with 6, 7, 8, or 9" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
+          </div>
+          <div class="form-group">
+            <label>Assign to Doctor</label>
+            <select id="editPatDoctor">
+              <option value="">-- Unassigned --</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Chief Complaint</label>
+          <textarea id="editPatComplaint" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-content" style="max-width: 450px; text-align: center;">
       <div style="font-size: 3.5rem; margin-bottom: 10px;">⚠️</div>
@@ -451,10 +520,16 @@
             if(!res.ok) throw new Error(data.error);
 
             globalHospMap = {};
+            window.globalPatientsList = [];
             const hospBody = document.getElementById('hospitalsTableBody');
             const hospFilter = document.getElementById('filterStaffHosp');
+            const patHospFilter = document.getElementById('filterPatHosp');
+            const patDocFilter = document.getElementById('filterPatDoc');
+            
             hospBody.innerHTML = '';
             hospFilter.innerHTML = '<option value="">All Hospitals</option>';
+            if(patHospFilter) patHospFilter.innerHTML = '<option value="">All Hospitals</option>';
+            if(patDocFilter) patDocFilter.innerHTML = '<option value="">All Doctors</option>';
 
             if (data.hospitals && data.hospitals.length > 0) {
                 // Populate global stats
@@ -468,6 +543,7 @@
                 data.hospitals.forEach(h => {
                     globalHospMap[h.id] = h.name; 
                     hospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
+                    if(patHospFilter) patHospFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`;
                     
                     const hStaffCount = allStaff.filter(s => s.hospital_id === h.id && s.role_type === 'Staff').length;
                     const hDocCount = allStaff.filter(s => s.hospital_id === h.id && s.role_type === 'Doctor').length;
@@ -496,6 +572,15 @@
 
             globalStaffList = data.staff || [];
             renderStaffTable();
+            
+            if(patDocFilter) {
+                const docs = globalStaffList.filter(s => s.role_type === 'Doctor');
+                docs.forEach(d => {
+                    patDocFilter.innerHTML += `<option value="${d.id}">${d.full_name}</option>`;
+                });
+            }
+            window.globalPatientsList = data.patients || [];
+            if(typeof renderPatientsTable === 'function') renderPatientsTable();
 
             const auditBody = document.getElementById('auditTableBody');
             auditBody.innerHTML = '';
@@ -566,6 +651,131 @@
             staffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No staff found matching filters.</td></tr>';
         }
     };
+
+    window.renderPatientsTable = function() {
+        const tbody = document.getElementById('patientsTableBody');
+        if(!tbody) return;
+        const nameFilter = document.getElementById('filterPatName').value.toLowerCase();
+        const hospFilter = document.getElementById('filterPatHosp').value;
+        const docFilter = document.getElementById('filterPatDoc').value;
+
+        tbody.innerHTML = '';
+
+        const filtered = (window.globalPatientsList || []).filter(p => {
+            if (nameFilter && !p.full_name.toLowerCase().includes(nameFilter) && !(p.pt_id && p.pt_id.toLowerCase().includes(nameFilter))) return false;
+            if (hospFilter && p.hospital_id !== hospFilter) return false;
+            if (docFilter && p.assigned_doctor_id !== docFilter) return false;
+            return true;
+        });
+
+        if (filtered.length > 0) {
+            filtered.forEach(p => {
+                const hospName = globalHospMap[p.hospital_id] || 'Unknown';
+                const docName = p.doctors ? (p.doctors.full_name.startsWith('Dr.') ? p.doctors.full_name : 'Dr. ' + p.doctors.full_name) : 'Unassigned';
+                const statusTag = p.treatment_status === 'completed' ? '<span class="tag" style="background:#10B981; color:white;">Completed</span>' : '<span class="tag">Ongoing</span>';
+                
+                tbody.innerHTML += `<tr>
+                    <td class="no-pdf" data-label="Select">
+                        <input type="checkbox" class="admin-patient-checkbox" data-id="${p.id}" style="width: 16px; height: 16px; cursor: pointer;">
+                    </td>
+                    <td data-label="Patient Info"><strong>${p.full_name}</strong><br><span style="font-size:0.8rem; color:#888;">${p.pt_id || ''} • +91-${p.phone}</span></td>
+                    <td data-label="Assigned Hospital">${hospName}</td>
+                    <td data-label="Assigned Doctor">${docName}</td>
+                    <td data-label="Status">${statusTag}</td>
+                    <td class="no-pdf" data-label="Action">
+                        <a href="#" class="action-link" style="margin-right: 12px;" onclick="openEditPatient('${p.id}')">✏️ Edit</a>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No patients found matching filters.</td></tr>';
+        }
+    };
+
+    
+    window.openEditPatient = async function(id) {
+      const patient = window.globalPatientsList.find(p => p.id === id);
+      if(!patient) return;
+      
+      const docSelect = document.getElementById('editPatDoctor');
+      docSelect.innerHTML = '<option value="">-- Unassigned --</option>';
+      const docs = window.globalStaffList.filter(s => s.role_type === 'Doctor');
+      docs.forEach(d => {
+          docSelect.innerHTML += `<option value="${d.id}">${d.full_name} (${window.globalHospMap[d.hospital_id] || ''})</option>`;
+      });
+
+      document.getElementById('editPatId').value = patient.id;
+      document.getElementById('editPatName').value = patient.full_name;
+      document.getElementById('editPatAge').value = patient.age || '';
+      document.getElementById('editPatGender').value = patient.gender || 'Male';
+      document.getElementById('editPatPhone').value = patient.phone || '';
+      document.getElementById('editPatComplaint').value = patient.chief_complaint || '';
+      document.getElementById('editPatDoctor').value = patient.assigned_doctor_id || '';
+      openModal('editPatientModal');
+    };
+
+    document.getElementById('editPatientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('.btn-submit');
+      const originalText = btn.innerText;
+      btn.innerText = 'Saving...'; btn.disabled = true;
+
+      const id = document.getElementById('editPatId').value;
+      const data = {
+        full_name: document.getElementById('editPatName').value,
+        age: document.getElementById('editPatAge').value,
+        gender: document.getElementById('editPatGender').value,
+        phone: document.getElementById('editPatPhone').value,
+        chief_complaint: document.getElementById('editPatComplaint').value,
+        assigned_doctor_id: document.getElementById('editPatDoctor').value || null
+      };
+
+      try {
+        const res = await fetch('/api/update_patient', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ patient_id: id, ...data })
+        });
+        const result = await res.json();
+        if(!res.ok) throw new Error(result.error);
+        
+        closeModal('editPatientModal');
+        await loadData();
+      } catch(err) {
+        alert("Failed to update patient: " + err.message);
+      } finally {
+        btn.innerText = originalText; btn.disabled = false;
+      }
+    });
+
+    window.deleteSelectedPatients = function() {
+        const checkboxes = document.querySelectorAll('.admin-patient-checkbox:checked');
+        if (checkboxes.length === 0) return alert("Select at least one patient to delete.");
+        
+        const ids = Array.from(checkboxes).map(cb => cb.dataset.id);
+        showConfirm(`Delete ${ids.length} Patient(s)?`, "Are you sure you want to permanently delete these patients and all their records? This cannot be undone.", () => {
+            executeDeletePatient(ids);
+        });
+    };
+
+    async function executeDeletePatient(ids) {
+        try {
+            for (const id of ids) {
+                const res = await fetch('/api/update_patient', {
+                    method: 'DELETE',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ patient_id: id })
+                });
+                if(!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error);
+                }
+            }
+            await loadData();
+        } catch (e) {
+            alert("Delete failed: " + e.message);
+        }
+    }
 
     window.deleteSingleStaff = function(id, role, name) {
         showConfirm(`Delete ${name}?`, `Are you sure you want to permanently delete this ${role}?`, () => executeDeleteStaff(role === 'Staff' ? [id] : [], role === 'Doctor' ? [id] : []));
